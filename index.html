@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#00205b">
+<meta name="description" content="SVE Movida SST: organiza datos de vigilancia epidemiológica, calcula indicadores, documenta acciones y genera informes preventivos en tu dispositivo.">
+<meta property="og:title" content="SVE | Laboratorio de Vigilancia Epidemiológica · La Movida SST">
+<meta property="og:description" content="De los datos a las decisiones preventivas. Registros organizados, indicadores, acciones y seguimiento.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://movidasst.github.io/sve/">
+<meta property="og:image" content="https://www.movidasst.com/logo-oficial-movida-sst-plus.png">
+<link rel="icon" href="https://www.movidasst.com/logo-oficial-movida-sst-plus.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="./app.js"></script>
+<title>SVE · Laboratorio de vigilancia epidemiológica | La Movida SST</title>
+</head>
+<body>
+<div class="app-shell">
+<header class="topbar">
+  <a class="brand" href="https://www.movidasst.com/" target="_blank" rel="noopener noreferrer" aria-label="Visitar La Movida de SST">
+    <img class="brand-logo" src="https://www.movidasst.com/logo-oficial-movida-sst-plus.png" alt="Logo oficial de La Movida SST" onerror="this.style.display='none'">
+    <span><strong>LA MOVIDA <em>SST+</em></strong><small>LABORATORIO SVE</small></span>
+  </a>
+  <div class="top-actions"><span class="private-label">◉ Datos locales</span><button class="icon-btn" id="helpTop" type="button" title="Guía rápida" aria-label="Abrir guía rápida">?</button></div>
+</header>
+<main id="main">
+<section id="panel-inicio" class="panel active" aria-labelledby="titulo-inicio">
+  <div class="hero">
+    <div class="hero-content"><span class="eyebrow">DE LA REACCIÓN A LA PREVENCIÓN</span>
+      <h1 id="titulo-inicio">Vigilancia con datos.<br><span>Prevención con evidencia.</span></h1>
+      <p>Una herramienta práctica para construir tu SVE: organiza información, calcula indicadores, interpreta señales y comprueba las acciones de mejora.</p>
+      <div class="hero-actions"><button class="btn yellow" id="goLoad" type="button">Comenzar con mis datos <span aria-hidden="true">›</span></button><button class="btn outline-light" id="goDemo" type="button">Explorar un caso de ejemplo</button></div>
+    </div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="pulse-mark">SVE<span>360°</span></div><span class="hero-dot dot1"></span><span class="hero-dot dot2"></span></div>
+  </div>
+  <div class="section-heading"><span class="eyebrow teal">RUTA DE APRENDIZAJE APLICADA</span><h2>De la señal inicial a la mejora</h2><p>El mismo hilo conductor de los cuatro módulos y la clase especial de estadística.</p></div>
+  <div class="journey" id="journey">
+    <div class="journey-item"><b>01</b><strong>Definir</strong><small>Evento, población, período y objetivo</small></div>
+    <div class="journey-item"><b>02</b><strong>Registrar</strong><small>Plantillas y fuentes comparables</small></div>
+    <div class="journey-item"><b>03</b><strong>Validar</strong><small>Unidades, duplicados y completitud</small></div>
+    <div class="journey-item"><b>04</b><strong>Calcular</strong><small>Numerador, denominador y unidad</small></div>
+    <div class="journey-item"><b>05</b><strong>Interpretar</strong><small>Hallazgos y límites de los datos</small></div>
+    <div class="journey-item"><b>06</b><strong>Actuar</strong><small>Responsable y medida preventiva</small></div>
+    <div class="journey-item"><b>07</b><strong>Verificar</strong><small>Seguimiento y ajuste</small></div>
+  </div>
+  <div class="section-heading compact"><h2>Tu espacio de trabajo</h2></div>
+  <div id="homeStats" class="stat-grid"></div>
+  <div class="two-columns">
+    <article class="surface-feature"><div class="feature-icon">▥</div><h3>Datos estructurados</h3><p>Descarga plantillas Excel/CSV, registra totales agregados e importa archivos sin copiar datos en formularios interminables.</p><button class="inline-action" data-tab="datos">Ir a plantillas →</button></article>
+    <article class="surface-feature"><div class="feature-icon">◈</div><h3>Decisiones rastreables</h3><p>Conecta un resultado con medidas, responsables por función, fechas y verificación. Un indicador aislado no completa un SVE.</p><button class="inline-action" data-tab="acciones">Ver seguimiento →</button></article>
+  </div>
+  <div class="notice notice-info"><strong>Protección de la información:</strong> esta versión funciona dentro de tu navegador y no envía registros a un servidor. Utiliza únicamente <strong>datos agregados y no identificables</strong>: nunca incluyas nombres, cédulas, correos ni historias clínicas.</div>
+</section>
+
+<section id="panel-datos" class="panel" aria-labelledby="titulo-datos">
+  <div class="page-lead"><span class="eyebrow teal">PASO 02 · REGISTRAR Y VALIDAR</span><h1 id="titulo-datos">Prepara tus datos</h1><p>Selecciona el componente del SVE, descarga su formato y carga los registros. Una fila representa un área y un período para un evento o actividad definidos.</p></div>
+  <div class="card">
+    <div class="field"><label for="datasetSelect">Componente que vas a trabajar</label><select id="datasetSelect"></select></div>
+    <div class="dataset-help"><h2 id="datasetTitle">Morbilidad y salud</h2><p id="datasetExplain"></p></div>
+    <div class="button-line"><button id="templateXLSX" type="button" class="btn primary">↓ Plantilla Excel</button><button id="templateCSV" type="button" class="btn secondary">↓ Plantilla CSV</button><button id="sampleCSV" type="button" class="btn quiet">↓ Ejemplo llenado</button></div>
+    <p class="fine-print" id="datasetRule"></p>
+  </div>
+  <div class="card">
+    <h2>Importa la información</h2>
+    <p class="muted">Admite Excel (.xlsx) y CSV (.csv). Los registros se validan antes de incorporarse; no se transmiten por internet.</p>
+    <label class="drop-zone" for="uploadFile" id="dropZone"><span class="upload-symbol">⇧</span><strong>Selecciona o arrastra un archivo</strong><small>Elige la plantilla del componente seleccionado</small><input type="file" id="uploadFile" accept=".csv,.xlsx,.xls" hidden></label>
+    <div id="importResult" aria-live="polite"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Registrar un resumen manualmente</h2><p class="muted">Introduce solo cantidades agregadas.</p></div><button type="button" class="btn quiet mini" id="toggleManual">Mostrar formulario</button></div>
+    <form id="manualForm" class="manual-form hidden"><div id="manualFields" class="form-grid"></div><button type="submit" class="btn primary full">Guardar registro</button></form>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Registros incorporados <span id="datasetCount" class="count-pill">0</span></h2><p class="muted" id="dataPreviewNote">Los registros son resúmenes agregados, no historias individuales.</p></div><button id="exportDataset" class="btn quiet mini" type="button">↓ CSV</button></div>
+    <div id="dataTableWrap" class="table-wrap"></div>
+    <div class="button-line end-line"><button id="deleteDataset" type="button" class="btn danger-outline">Borrar este componente</button></div>
+  </div>
+</section>
+
+<section id="panel-indicadores" class="panel" aria-labelledby="titulo-indicadores">
+  <div class="page-lead"><span class="eyebrow teal">PASOS 03–05 · CALCULAR E INTERPRETAR</span><h1 id="titulo-indicadores">Indicadores de vigilancia</h1><p>Los resultados expresan exactamente lo que miden los registros. Comparar no significa demostrar causalidad.</p></div>
+  <div class="card filter-card">
+    <div class="filter-grid"><div class="field"><label for="periodFilter">Período</label><select id="periodFilter"></select></div><div class="field"><label for="areaFilter">Área</label><select id="areaFilter"></select></div><div class="field"><label for="conditionFilter">Condición vigilada</label><select id="conditionFilter"></select></div></div>
+    <p id="filterNote" class="fine-print"></p>
+  </div>
+  <div class="section-heading compact"><h2>Resultados y cálculos</h2></div>
+  <div id="indicatorGrid" class="metric-grid"></div>
+  <div class="card">
+    <div class="card-head"><div><h2>Comparación entre áreas</h2><p class="muted">Prevalencia puntual de la condición seleccionada, en el mismo período.</p></div></div>
+    <div id="areaChart" class="bar-chart"></div>
+    <div id="chartNote" class="fine-print"></div>
+  </div>
+  <div class="card interpretation-card"><h2>Lectura preventiva de los resultados</h2><div id="interpretations"></div></div>
+  <div class="notice notice-warn"><strong>Regla epidemiológica:</strong> prevalencia = casos presentes / población evaluada en una fecha; incidencia acumulada = casos nuevos / población inicialmente libre de la condición, para el período y cohorte definidos. Si el seguimiento no fue completo, la aplicación no presenta el cociente simple como estimación válida.</div>
+</section>
+
+<section id="panel-acciones" class="panel" aria-labelledby="titulo-acciones">
+  <div class="page-lead"><span class="eyebrow teal">PASOS 06–07 · ACTUAR Y VERIFICAR</span><h1 id="titulo-acciones">De hallazgos a medidas</h1><p>Registra decisiones que puedan comprobarse: qué problema abordar, qué se hará, quién es responsable y cuándo verificar los resultados.</p></div>
+  <div class="card"><h2>Nueva acción preventiva</h2>
+    <form id="actionForm" class="form-grid">
+      <div class="field"><label for="aModule">Componente</label><select id="aModule"></select></div>
+      <div class="field"><label for="aPriority">Prioridad</label><select id="aPriority"><option>Alta</option><option selected>Media</option><option>Baja</option></select></div>
+      <div class="field span-2"><label for="aFinding">Hallazgo verificable</label><textarea id="aFinding" maxlength="450" required placeholder="Ej.: La cobertura de evaluaciones de mantenimiento fue 68 % en octubre."></textarea></div>
+      <div class="field span-2"><label for="aMeasure">Medida propuesta</label><textarea id="aMeasure" maxlength="450" required placeholder="Qué se hará exactamente y sobre qué condición de trabajo."></textarea></div>
+      <div class="field"><label for="aOwner">Responsable por función</label><input id="aOwner" maxlength="90" required placeholder="Ej.: Servicio de SST / Jefatura de área"></div>
+      <div class="field"><label for="aDue">Fecha de verificación</label><input id="aDue" type="date" required></div>
+      <div class="field span-2"><label for="aEvidence">Evidencia esperada</label><input id="aEvidence" maxlength="300" required placeholder="Ej.: acta de inspección, resultado de medición, lista de acciones verificadas"></div>
+      <button type="submit" class="btn primary full span-2">+ Registrar acción</button>
+    </form>
+  </div>
+  <div class="section-heading compact"><h2>Seguimiento <span id="actionCount" class="count-pill">0</span></h2></div>
+  <div id="actionsList" class="actions-list"></div>
+</section>
+
+<section id="panel-informes" class="panel" aria-labelledby="titulo-informes">
+  <div class="page-lead"><span class="eyebrow teal">EVIDENCIA Y COMUNICACIÓN</span><h1 id="titulo-informes">Informe del SVE</h1><p>Prepara resultados para reuniones técnicas, seguimiento y toma de decisiones. Los informes incluyen definiciones y advertencias de interpretación.</p></div>
+  <div class="card">
+    <div class="field"><label for="reportOrganization">Nombre de empresa o centro de trabajo (opcional)</label><input id="reportOrganization" maxlength="95" placeholder="Ej.: Talleres Horizonte (sin datos personales)"></div>
+    <div class="button-line"><button id="printReport" class="btn primary" type="button">▤ Generar PDF / Imprimir</button><button id="exportWorkbook" class="btn secondary" type="button">↓ Exportar Excel</button><button id="downloadBackup" class="btn quiet" type="button">↓ Respaldo CSV</button></div>
+    <p class="fine-print">El PDF se obtiene mediante la función de impresión del navegador («Guardar como PDF»). Excel exporta las hojas de datos y de acciones.</p>
+  </div>
+  <div id="reportPreview" class="report-preview"></div>
+  <div class="card">
+    <h2>Administrar datos locales</h2><p class="muted">Esta app mantiene resúmenes agregados en este navegador. Puedes exportarlos para transferirlos a otro equipo. Borrar los datos locales no altera ningún archivo que hayas descargado.</p>
+    <div class="button-line"><button id="loadDemoReports" type="button" class="btn quiet">Probar con datos ficticios</button><button id="clearAll" type="button" class="btn danger-outline">Eliminar todos los datos locales</button></div>
+  </div>
+</section>
+</main>
+<nav class="bottom-nav" aria-label="Navegación principal">
+<button type="button" class="nav-item active" data-tab="inicio" aria-current="page"><span class="nav-symbol" aria-hidden="true">⌂</span><span>Inicio</span></button>
+<button type="button" class="nav-item" data-tab="datos"><span class="nav-symbol" aria-hidden="true">▦</span><span>Datos</span></button>
+<button type="button" class="nav-item" data-tab="indicadores"><span class="nav-symbol" aria-hidden="true">▤</span><span>Indicadores</span></button>
+<button type="button" class="nav-item" data-tab="acciones"><span class="nav-symbol" aria-hidden="true">✓</span><span>Acciones</span></button>
+<button type="button" class="nav-item" data-tab="informes"><span class="nav-symbol" aria-hidden="true">⇩</span><span>Informes</span></button>
+</nav>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<dialog id="helpDialog" class="help-dialog"><form method="dialog"><button class="close-help" aria-label="Cerrar">×</button><span class="eyebrow teal">GUÍA RÁPIDA</span><h2>Cómo utilizar el laboratorio SVE</h2><p>1. <b>Define</b> un evento, área y período. 2. <b>Descarga</b> una plantilla del componente. 3. <b>Completa</b> los totales agregados e <b>importa</b> el archivo. 4. <b>Analiza</b> las medidas y sus denominadores. 5. <b>Registra</b> una acción y cómo comprobarás sus resultados. 6. <b>Genera</b> el informe para su seguimiento.</p><p>La aplicación valida estructuras y algunos errores numéricos, pero no verifica diagnósticos, calidad clínica ni relación causal. No sustituye las responsabilidades del Servicio de SST.</p><p><b>Privacidad:</b> no subas nombres, códigos individuales, RUT/cédulas ni historias de salud. Guarda solo datos colectivos.</p><p><b>Compatibilidad:</b> CSV funciona sin librerías externas. Para importar/exportar Excel se requiere acceso a la librería XLSX.</p><button class="btn primary full">Entendido</button></form></dialog>
+<section id="printSheet" aria-label="Versión imprimible del informe"></section>
+</body>
+</html>
