@@ -9,7 +9,7 @@ Definir → Registrar → Validar → Calcular → Interpretar → Actuar → Ve
 
 ## Funciones
 - Aplicación responsive con barra inferior fija y cinco pestañas: Inicio, Datos, Indicadores, Acciones, Informes.
-- Plantillas **CSV y Excel** para once componentes, incluidos los seis nuevos bloques normativos: morbilidad, accidentes, procesos peligrosos, tiempo libre y cobertura.
+- Plantillas **CSV y Excel** para doce componentes, incluidos siete bloques normativos adicionales: morbilidad, accidentes, procesos peligrosos, tiempo libre y cobertura.
 - Carga local de datos estructurados con validaciones; rechaza columnas de identificación personal y duplicados se actualizan por clave.
 - Prevalencia puntual, incidencia acumulada condicionada a cohorte y seguimiento, conteo de consultas, frecuencia operativa de accidentes, verificación de controles, descanso efectivo, vacaciones y cobertura.
 - Selección de período, área, condición de morbilidad y actividad de cobertura.
@@ -19,13 +19,16 @@ Definir → Registrar → Validar → Calcular → Interpretar → Actuar → Ve
 
 ## Versión normativa — Informes técnicos y matriz (octubre 2026)
 
-Además de las cinco plantillas iniciales, esta versión incorpora seis nuevas plantillas agregadas:
+Además de las cinco plantillas iniciales, esta versión incorpora **siete** plantillas agregadas adicionales:
+- **Evaluaciones médicas ocupacionales**: ingreso, prevacacional, posvacacional, egreso, periódicas por exposición y anuales programadas según riesgos o plan. Cada una controla evaluaciones programadas, realizadas, en plazo y con seguimiento; la aplicación calcula pendientes y cobertura por tipo. Los plazos de 15 días hábiles para pre y posvacacionales se verifican frente a los registros originales custodiados por el Servicio de SST.
 - **Enfermedades y accidentes comunes**: clasificación diferenciada de enfermedades comunes, enfermedades ocupacionales calificadas, sospechas y accidentes comunes.
 - **Reposos**: episodios y días, según origen documentado.
-- **Salud complementaria**: exámenes de salud, resultados que necesitan seguimiento, referencias especializadas y personas con discapacidad, solamente totales colectivos.
+- **Salud complementaria**: resumen histórico agregado de exámenes, resultados que necesitan seguimiento, referencias especializadas y personas con discapacidad. Si también utilizas evaluaciones desglosadas, no sumes ambos registros porque pueden duplicar exámenes.
 - **Mediciones**: cantidad de mediciones ocupacionales/ambientales y revisión frente a criterios técnicos documentados.
 - **Controles**: fuente, ambiente y trabajadores, con implementación y verificación.
 - **Jornada detallada**: horas, alimentación, descansos obligatorios/convencionales, vacaciones y actividades recreativas. Son **consolidados**; los registros por trabajador exigidos en el art. 36 deben conservarse fuera de GitHub Pages en un sistema protegido.
+
+**Nota técnica:** «anual programada» no significa un examen legal uniforme una vez al año para toda exposición; se documenta conforme a la evaluación de riesgos y el programa aplicable, sin sustituir otras evaluaciones obligatorias.
 
 ### Informes disponibles
 En **Informes → Generador documental SVE** elige:
