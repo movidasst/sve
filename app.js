@@ -129,6 +129,24 @@ function renderExamIndicators(){
  target.innerHTML=header+[...by].map(([type,x])=>'<tr><td><strong>'+htmlEsc(type)+'</strong></td><td>'+fmt(x.plan)+'</td><td>'+fmt(x.done)+'</td><td>'+fmt(Math.max(0,x.plan-x.done))+'</td><td>'+valPct(pct(x.done,x.plan))+'</td><td>'+valPct(pct(x.timely,x.done))+'</td><td>'+fmt(x.followup)+'</td></tr>').join('')+'</tbody></table></div><p class="fine-print">La cobertura se calcula por tipo de examen: realizados/programados. «En plazo» se calcula sobre los realizados según el plazo aplicable. Los exámenes pueden corresponder a una misma persona en diferentes momentos; no sumes tipos para obtener personas únicas.</p>';
 }
 
+
+function renderPsychosocialIndicators(){
+ const target=$('#psychosocialIndicators');
+ if(!target)return;
+ const list=rowsFor('psicosocial');
+ if(!list.length){
+  target.innerHTML='<p class="muted">Todavía no hay registros de condiciones psicosociales para este período. En Datos selecciona «Condiciones psicosociales y organización del trabajo» y descarga la plantilla.</p>';
+  return;
+ }
+ const header='<div class="table-wrap"><table class="data-table psy-table"><thead><tr><th>Área / factor</th><th>Método</th><th>Evaluación</th><th>Señales</th><th>Medidas verificadas</th></tr></thead><tbody>';
+ target.innerHTML=header+list.map(r=>{
+  const enough=r.personas_evaluadas>=5&&r.personas_elegibles>=5;
+  const alerts=enough&&r.personas_con_senal>=5?r.personas_con_senal+' ('+valPct(pct(r.personas_con_senal,r.personas_evaluadas))+')':r.personas_con_senal===0?'Sin señales': 'Reservado por grupo pequeño';
+  const coverage=enough?valPct(pct(r.personas_evaluadas,r.personas_elegibles)):'Reservado';
+  return '<tr><td><strong>'+htmlEsc(r.area)+'</strong><br>'+htmlEsc(r.factor)+'</td><td>'+htmlEsc(r.metodo)+'</td><td>'+coverage+'<br><small>'+ (enough?fmt(r.personas_evaluadas)+' de '+fmt(r.personas_elegibles):'Grupo pequeño')+'</small></td><td>'+htmlEsc(alerts)+'</td><td>'+fmt(r.medidas_verificadas)+' / '+fmt(r.medidas_programadas)+'</td></tr>';
+ }).join('')+'</tbody></table></div>';
+}
+
 function renderIndicators(){optionsForFilter();const x=collectMetrics(),n=x.m.length;$('#indicatorGrid').innerHTML=[
 card('Prevalencia puntual',valPct(x.pre),x.m.length?sum(x.m,'casos_existentes')+' casos / '+sum(x.m,'poblacion_evaluada')+' personas evaluadas':'Sin datos de morbilidad'),
 card('Incidencia acumulada',valPct(x.inc),n?(x.inc===null?'Seguimiento incompleto o sin población en riesgo válida':sum(x.m,'casos_nuevos')+' casos nuevos / '+sum(x.m,'poblacion_en_riesgo')+' personas inicialmente en riesgo'):'Sin datos',x.inc===null&&n>0),
@@ -141,11 +159,14 @@ card('Descanso efectivo',valPct(x.desc),x.t.length?sum(x.t,'personas_descanso_ef
 card('Vacaciones disfrutadas',valPct(x.vac),x.t.length?sum(x.t,'dias_vacaciones_disfrutados')+' días / '+sum(x.t,'dias_vacaciones_programados')+' días programados':'Sin datos')
 ].join('');
 renderExamIndicators();
+renderPsychosocialIndicators();
 const byArea=new Map();for(const r of x.m){const k=r.area,z=byArea.get(k)||{existing:0,pop:0};z.existing+=r.casos_existentes;z.pop+=r.poblacion_evaluada;byArea.set(k,z)}const vals=[...byArea].map(([area,r])=>({area,p:pct(r.existing,r.pop)})).filter(r=>r.p!==null).sort((a,b)=>b.p-a.p);$('#areaChart').innerHTML=vals.length?vals.map(y=>'<div class="bar-entry"><strong title="'+htmlEsc(y.area)+'">'+htmlEsc(y.area)+'</strong><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,y.p).toFixed(2)+'%"></div></div><span>'+valPct(y.p)+'</span></div>').join(''):'<div class="empty-table">Carga información de morbilidad para comparar áreas.</div>';$('#chartNote').textContent=vals.length?'Porcentaje = casos existentes / población evaluada del área × 100. Las diferencias descriptivas no prueban causalidad.':'';
 const observations=[];if(x.m.length){observations.push(['Morbilidad','En la condición «'+filter.condition+'» se registraron '+sum(x.m,'casos_existentes')+' personas con la condición de '+sum(x.m,'poblacion_evaluada')+' evaluadas en '+filter.period+'. La prevalencia puntual es '+valPct(x.pre)+'. '+(x.inc===null?'No se estima incidencia acumulada simple: falta seguimiento completo o población válida.':'Se identificaron '+sum(x.m,'casos_nuevos')+' casos nuevos entre '+sum(x.m,'poblacion_en_riesgo')+' personas inicialmente libres de la condición ('+valPct(x.inc)+' en el período).')])}
 if(x.c.length)observations.push(['Cobertura','Completaron la actividad '+sum(x.c,'completadas')+' de '+sum(x.c,'elegibles')+' personas elegibles ('+valPct(x.co)+'). Esta cifra describe alcance, no eficacia preventiva.']);
 if(x.p.length)observations.push(['Procesos','Se verificaron '+sum(x.p,'controles_verificados')+' de '+sum(x.p,'controles_programados')+' controles programados ('+valPct(x.ver)+'). Es necesario contrastar además el funcionamiento real de esos controles.']);
 if(x.t.length)observations.push(['Tiempo libre','El disfrute de vacaciones registrado equivale al '+valPct(x.vac)+' de los días programados. Debe investigarse el motivo de los días pendientes; no atribuir automáticamente efectos sobre la salud.']);
+const psy=rowsFor('psicosocial');
+if(psy.length)observations.push(['Organización del trabajo y factores psicosociales', 'Se han registrado '+psy.length+' evaluaciones colectivas de factores y métodos, por área y período. Revisa cobertura, señales y acciones sin sumar participantes entre factores: una persona podría responder a varios. Una señal requiere evaluación de condiciones organizacionales y no prueba enfermedad ni causalidad.']);
 if(x.a.length)observations.push(['Accidentes','Se registraron '+sum(x.a,'accidentes')+' accidentes de trabajo y '+sum(x.a,'incidentes')+' incidentes en el período. Examina severidad, tareas y causas con la investigación correspondiente.']);
 $('#interpretations').innerHTML=observations.length?observations.map(([title,text])=>'<div class="reading-card"><strong>'+htmlEsc(title)+'</strong><p>'+htmlEsc(text)+'</p></div>').join(''):'<div class="empty-table">Aún no hay registros para interpretar. Ve a Datos y comienza por una plantilla.</div>';
 }
