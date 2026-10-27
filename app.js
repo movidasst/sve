@@ -66,13 +66,23 @@ function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify({db,actions
 function load(){try{const old=JSON.parse(localStorage.getItem(STORE_KEY)||'null');if(old&&old.db){for(const k of Object.keys(DATA_TYPES))db[k]=Array.isArray(old.db[k])?old.db[k]:[];actions=Array.isArray(old.actions)?old.actions:[];isDemo=!!old.isDemo}}catch(e){db=emptyDB();actions=[]}}
 function go(tab){const key=['inicio','datos','indicadores','acciones','informes'].includes(tab)?tab:'inicio';$$('.panel').forEach(x=>x.classList.toggle('active',x.id==='panel-'+key));$$('.nav-item').forEach(x=>{let active=x.dataset.tab===key;x.classList.toggle('active',active);if(active)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')});if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});if(key==='inicio')renderHome();if(key==='datos')renderData();if(key==='indicadores')renderIndicators();if(key==='acciones')renderActions();if(key==='informes')renderReport()}
 function renderHome(){const rows=Object.values(db).reduce((a,v)=>a+v.length,0),open=actions.filter(a=>a.status!=='Verificada').length;$('#homeStats').innerHTML=[[''+Object.values(db).filter(a=>a.length).length,'Componentes con datos'],[''+rows,'Registros agregados'],[''+open,'Acciones por verificar']].map(([value,label])=>'<div class="stat-card"><div class="value">'+htmlEsc(value)+'</div><span>'+htmlEsc(label)+'</span></div>').join('');}
-function updateDatasetSelect(){const el=$('#datasetSelect');el.innerHTML=Object.entries(DATA_TYPES).map(([k,v])=>option(k,v.name,k===dataset)).join('');$('#aModule').innerHTML=Object.entries(DATA_TYPES).map(([k,v])=>option(k,v.name,false)).join('')}
+function updateDatasetSelect(){
+ const groups=[
+ ['Vigilancia de salud y exámenes',['evaluaciones_medicas','morbilidad','eventos_salud','reposos','salud_complementaria','accidentes']],
+ ['Procesos peligrosos',['procesos','mediciones','controles']],
+ ['Tiempo libre',['tiempo','jornada_detalle']],
+ ['Implementación y cobertura',['cobertura']]
+ ];
+ $('#datasetSelect').innerHTML=groups.map(([label,keys])=>'<optgroup label="'+htmlEsc(label)+'">'+keys.filter(k=>DATA_TYPES[k]).map(k=>option(k,DATA_TYPES[k].name,k===dataset)).join('')+'</optgroup>').join('');
+ $('#aModule').innerHTML=Object.entries(DATA_TYPES).map(([k,v])=>option(k,v.name,false)).join('');
+}
 function renderData(){const m=DATA_TYPES[dataset];$('#datasetSelect').value=dataset;$('#datasetTitle').textContent=m.name;$('#datasetExplain').textContent=m.description;$('#datasetRule').textContent='Cómo completar el formato: '+m.rule;$('#datasetCount').textContent=db[dataset].length;renderManualFields();renderDataTable()}
 function renderManualFields(){
  const m=DATA_TYPES[dataset],sets={
   categoria:['Enfermedad común','Enfermedad ocupacional calificada','Sospecha de origen ocupacional','Accidente común'],
   origen:['Enfermedad común','Enfermedad ocupacional calificada','Accidente común','Accidente de trabajo'],
-  nivel:['Fuente','Ambiente','Trabajadores']
+  nivel:['Fuente','Ambiente','Trabajadores'],
+  tipo_evaluacion:['Ingreso','Prevacacional','Posvacacional','Egreso','Periódica por exposición','Anual programada','Otra programada']
  };
  $('#manualFields').innerHTML=m.columns.map(c=>{
    const label='<label for="field_'+htmlEsc(c)+'">'+htmlEsc(c.replaceAll('_',' '))+'</label>';
@@ -104,6 +114,21 @@ function optionsForFilter(){const all=Object.values(db).flat(),periods=[...new S
 function rowsFor(k){return db[k].filter(r=>(!filter.period||r.periodo===filter.period)&&(!filter.area||r.area===filter.area)&&(k!=='morbilidad'||!filter.condition||r.condicion===filter.condition)&&(k!=='cobertura'||!filter.activity||r.actividad===filter.activity))}
 function card(label,num,foot,warning=false){return '<div class="metric-card'+(warning?' warning':'')+'"><div class="m-label">'+htmlEsc(label)+'</div><div class="m-number">'+htmlEsc(num)+'</div><div class="m-foot">'+htmlEsc(foot)+'</div></div>'}
 function collectMetrics(){const m=rowsFor('morbilidad'),a=rowsFor('accidentes'),p=rowsFor('procesos'),t=rowsFor('tiempo'),c=rowsFor('cobertura');const pre=pct(sum(m,'casos_existentes'),sum(m,'poblacion_evaluada')),inc=m.length&&m.every(x=>x.seguimiento_completo==='si')?pct(sum(m,'casos_nuevos'),sum(m,'poblacion_en_riesgo')):null,co=pct(sum(c,'completadas'),sum(c,'elegibles')),ver=pct(sum(p,'controles_verificados'),sum(p,'controles_programados')),desc=pct(sum(t,'personas_descanso_efectivo'),sum(t,'personas_elegibles')),vac=pct(sum(t,'dias_vacaciones_disfrutados'),sum(t,'dias_vacaciones_programados')),rate=sum(a,'horas_trabajadas')?sum(a,'accidentes')*1e6/sum(a,'horas_trabajadas'):null;return {m,a,p,t,c,pre,inc,co,ver,desc,vac,rate}}
+function renderExamIndicators(){
+ const target=$('#examsIndicators');
+ if(!target)return;
+ const records=rowsFor('evaluaciones_medicas');
+ const by=new Map();
+ for(const r of records){
+   const k=r.tipo_evaluacion, x=by.get(k)||{plan:0,done:0,timely:0,followup:0};
+   x.plan+=r.programadas;x.done+=r.realizadas;x.timely+=r.realizadas_en_plazo;x.followup+=r.con_seguimiento;
+   by.set(k,x);
+ }
+ if(!by.size){target.innerHTML='<p class="muted">Aún no hay evaluaciones médicas de este período. Descarga la plantilla en Datos → Vigilancia de salud y exámenes.</p>';return}
+ const header='<div class="table-wrap"><table class="data-table"><thead><tr><th>Tipo de evaluación</th><th>Programadas</th><th>Realizadas</th><th>Pendientes</th><th>Cobertura</th><th>En plazo</th><th>Seguimiento</th></tr></thead><tbody>';
+ target.innerHTML=header+[...by].map(([type,x])=>'<tr><td><strong>'+htmlEsc(type)+'</strong></td><td>'+fmt(x.plan)+'</td><td>'+fmt(x.done)+'</td><td>'+fmt(Math.max(0,x.plan-x.done))+'</td><td>'+valPct(pct(x.done,x.plan))+'</td><td>'+valPct(pct(x.timely,x.done))+'</td><td>'+fmt(x.followup)+'</td></tr>').join('')+'</tbody></table></div><p class="fine-print">La cobertura se calcula por tipo de examen: realizados/programados. «En plazo» se calcula sobre los realizados según el plazo aplicable. Los exámenes pueden corresponder a una misma persona en diferentes momentos; no sumes tipos para obtener personas únicas.</p>';
+}
+
 function renderIndicators(){optionsForFilter();const x=collectMetrics(),n=x.m.length;$('#indicatorGrid').innerHTML=[
 card('Prevalencia puntual',valPct(x.pre),x.m.length?sum(x.m,'casos_existentes')+' casos / '+sum(x.m,'poblacion_evaluada')+' personas evaluadas':'Sin datos de morbilidad'),
 card('Incidencia acumulada',valPct(x.inc),n?(x.inc===null?'Seguimiento incompleto o sin población en riesgo válida':sum(x.m,'casos_nuevos')+' casos nuevos / '+sum(x.m,'poblacion_en_riesgo')+' personas inicialmente en riesgo'):'Sin datos',x.inc===null&&n>0),
@@ -115,6 +140,7 @@ card('Cobertura de vigilancia',valPct(x.co),x.c.length?sum(x.c,'completadas')+' 
 card('Descanso efectivo',valPct(x.desc),x.t.length?sum(x.t,'personas_descanso_efectivo')+' personas con descanso / '+sum(x.t,'personas_elegibles')+' elegibles':'Sin datos'),
 card('Vacaciones disfrutadas',valPct(x.vac),x.t.length?sum(x.t,'dias_vacaciones_disfrutados')+' días / '+sum(x.t,'dias_vacaciones_programados')+' días programados':'Sin datos')
 ].join('');
+renderExamIndicators();
 const byArea=new Map();for(const r of x.m){const k=r.area,z=byArea.get(k)||{existing:0,pop:0};z.existing+=r.casos_existentes;z.pop+=r.poblacion_evaluada;byArea.set(k,z)}const vals=[...byArea].map(([area,r])=>({area,p:pct(r.existing,r.pop)})).filter(r=>r.p!==null).sort((a,b)=>b.p-a.p);$('#areaChart').innerHTML=vals.length?vals.map(y=>'<div class="bar-entry"><strong title="'+htmlEsc(y.area)+'">'+htmlEsc(y.area)+'</strong><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(100,y.p).toFixed(2)+'%"></div></div><span>'+valPct(y.p)+'</span></div>').join(''):'<div class="empty-table">Carga información de morbilidad para comparar áreas.</div>';$('#chartNote').textContent=vals.length?'Porcentaje = casos existentes / población evaluada del área × 100. Las diferencias descriptivas no prueban causalidad.':'';
 const observations=[];if(x.m.length){observations.push(['Morbilidad','En la condición «'+filter.condition+'» se registraron '+sum(x.m,'casos_existentes')+' personas con la condición de '+sum(x.m,'poblacion_evaluada')+' evaluadas en '+filter.period+'. La prevalencia puntual es '+valPct(x.pre)+'. '+(x.inc===null?'No se estima incidencia acumulada simple: falta seguimiento completo o población válida.':'Se identificaron '+sum(x.m,'casos_nuevos')+' casos nuevos entre '+sum(x.m,'poblacion_en_riesgo')+' personas inicialmente libres de la condición ('+valPct(x.inc)+' en el período).')])}
 if(x.c.length)observations.push(['Cobertura','Completaron la actividad '+sum(x.c,'completadas')+' de '+sum(x.c,'elegibles')+' personas elegibles ('+valPct(x.co)+'). Esta cifra describe alcance, no eficacia preventiva.']);
