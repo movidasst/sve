@@ -204,8 +204,87 @@ if(x.t.length)mNotes.push('Tiempo libre: descanso efectivo '+valPct(x.desc)+'; d
 if(x.c.length)mNotes.push('Implementación: cobertura de actividades '+valPct(x.co)+'.');
 const actionRows=actions.map(a=>'<tr><td>'+htmlEsc(a.finding)+'</td><td>'+htmlEsc(a.measure)+'</td><td>'+htmlEsc(a.owner)+'</td><td>'+htmlEsc(a.due)+'</td><td>'+htmlEsc(a.status)+'</td></tr>').join('');
 return {name,period,label,notes:mNotes,actions:actionRows,metrics:x}};
-function renderReport(){optionsForFilter();const r=reportHTML();$('#reportPreview').innerHTML='<div class="eyebrow teal">'+htmlEsc(r.label)+'</div><h2 style="margin:8px 0">Informe de vigilancia epidemiológica</h2><p class="r-sub">'+htmlEsc(r.name||'Centro de trabajo sin identificar')+' · Período '+htmlEsc(r.period)+' · '+htmlEsc(filter.area||'Todas las áreas')+'</p><div class="r-grid"><div class="r-stat"><b>'+valPct(r.metrics.pre)+'</b><small>Prevalencia puntual</small></div><div class="r-stat"><b>'+valPct(r.metrics.inc)+'</b><small>Incidencia acumulada</small></div><div class="r-stat"><b>'+valPct(r.metrics.co)+'</b><small>Cobertura de evaluaciones</small></div></div><h3>Hallazgos calculados</h3>'+(r.notes.length?'<ul class="report-list">'+r.notes.map(n=>'<li>'+htmlEsc(n)+'</li>').join('')+'</ul>':'<p class="muted">No hay registros para los filtros seleccionados.</p>')+'<h3>Acciones preventivas</h3><p class="muted">'+actions.length+' medidas documentadas; '+actions.filter(a=>a.status==='Verificada').length+' verificadas.</p><p class="fine-print">Este reporte resume únicamente registros agregados. No constituye diagnóstico clínico, calificación ocupacional ni demostración causal.</p>'}
-function buildPrintable(){const r=reportHTML();$('#printSheet').innerHTML='<div><img class="print-logo" src="https://www.movidasst.com/logo-oficial-movida-sst-plus.png" alt=""><div class="print-note">LA MOVIDA DE SST · DE LA REACCIÓN A LA PREVENCIÓN</div><h1>Informe de vigilancia epidemiológica</h1><p><b>'+htmlEsc(r.name||'Centro de trabajo no identificado')+'</b><br>Período: '+htmlEsc(r.period)+' · Área: '+htmlEsc(filter.area||'Todas')+' · Condición: '+htmlEsc(filter.condition||'No definida')+'</p><p>'+htmlEsc(r.label)+'</p><h2>Resultados calculados</h2>'+(r.notes.length?'<ol>'+r.notes.map(x=>'<li class="print-note">'+htmlEsc(x)+'</li>').join('')+'</ol>':'<p>Sin registros en los filtros seleccionados.</p>')+'<h2>Acciones preventivas y verificación</h2><table><thead><tr><th>Hallazgo</th><th>Medida</th><th>Responsable</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>'+r.actions+'</tbody></table><h2>Criterios de interpretación</h2><p class="print-note">Prevalencia puntual: casos presentes / población en la fecha. Incidencia acumulada: casos nuevos / población inicialmente libre de condición, con seguimiento completo. Los registros de consultas no equivalen a personas enfermas. Comparar áreas no demuestra causalidad. La cobertura no demuestra por sí sola eficacia.</p><p class="print-foot">Academia Movida de SST · Elaborado por David Linares Brea · www.movidasst.com · Documento generado en el navegador; información agregada.</p></div>'}
+
+function renderReport(){
+ optionsForFilter();
+ const r=reportHTML(),total=Object.values(db).reduce((n,rows)=>n+rows.length,0);
+ const defined=Object.values(reportDesign).filter(x=>String(x).trim()).length;
+ const steps=[
+ ['1. Definir',defined+'/3 respuestas'],['2. Registrar',total+' registros'],
+ ['3. Calcular',r.notes.length+' lecturas'],['4. Interpretar','Con límites'],
+ ['5. Actuar',actions.length+' acciones'],['6. Verificar',actions.filter(a=>a.status==='Verificada').length+' verificadas']
+ ];
+ $('#reportPreview').innerHTML='<div class="eyebrow teal">'+htmlEsc(r.label)+'</div>'+
+ '<h2 style="margin:8px 0">Vista previa · Informe guiado de vigilancia</h2>'+
+ '<p class="r-sub">'+htmlEsc(r.name||'Centro de trabajo pendiente')+' · '+htmlEsc(r.period)+' · '+htmlEsc(filter.area||'Todas las áreas')+'</p>'+
+ '<p class="muted">El PDF sigue seis etapas de trabajo, no comienza directamente con una tabla de cifras. Si faltan definiciones o registros, aparecerán como pendientes.</p>'+
+ '<div class="report-stage-grid">'+steps.map(([a,b])=>'<div><strong>'+htmlEsc(a)+'</strong><span>'+htmlEsc(b)+'</span></div>').join('')+'</div>'+
+ '<h3>Qué se incluirá</h3><p class="muted">'+htmlEsc(r.notes.length?'Indicadores y hallazgos, denominadores, limitaciones, '+actions.length+' acciones preventivas y criterios de verificación.':'Todavía no hay datos para calcular. El documento contendrá tu diseño inicial y los campos que faltan por completar.')+'</p>';
+}
+function buildPrintable(){
+ const r=reportHTML(),x=r.metrics,esc=htmlEsc,period=r.period,area=filter.area||'Todas las áreas',
+ effective=Object.fromEntries(Object.keys(DATA_TYPES).map(k=>[k,(db[k]||[]).filter(z=>(!filter.period||z.periodo===filter.period)&&(!filter.area||z.area===filter.area))]));
+ const withData=Object.keys(effective).filter(k=>effective[k].length>0);
+ const num=(arr,key)=>sum(arr,key),pctText=n=>valPct(n);
+ const word=(value)=>value&&String(value).trim()?esc(value):'<em class="pdf-pending">Pendiente de definir: completar en Inicio.</em>';
+ const step=(n,title,lead,contents)=>'<section class="pdf-section"><div class="pdf-section-head"><span>'+n+'</span><div><h2>'+title+'</h2><p>'+lead+'</p></div></div>'+contents+'</section>';
+ const kpi=(title,value,formula,reading)=>'<article class="pdf-indicator"><strong>'+esc(title)+'</strong><b>'+esc(value)+'</b><small>'+esc(formula)+'</small><p>'+esc(reading)+'</p></article>';
+ const metrics=[];
+ if(x.m.length){
+  metrics.push(kpi('Prevalencia puntual',pctText(x.pre),num(x.m,'casos_existentes')+' casos existentes / '+num(x.m,'poblacion_evaluada')+' personas evaluadas × 100','Es la proporción de casos existentes en la fecha de corte. No expresa casos nuevos ni demuestra el origen del problema.'));
+  metrics.push(kpi('Incidencia acumulada',pctText(x.inc),num(x.m,'casos_nuevos')+' casos nuevos / '+num(x.m,'poblacion_en_riesgo')+' personas inicialmente libres de la condición × 100',x.inc===null?'No estimable: revisar seguimiento, denominador o criterio de cohorte.':'Solo es interpretable para la cohorte y el período con seguimiento completo declarados.'));
+ }
+ if(x.a.length)metrics.push(kpi('Accidentes por millón de horas',x.rate===null?'No calculable':fmt(x.rate,1),num(x.a,'accidentes')+' eventos / '+num(x.a,'horas_trabajadas')+' horas × 1.000.000','Es frecuencia operativa de eventos, no incidencia de personas accidentadas.'));
+ if(x.c.length)metrics.push(kpi('Cobertura de actividad',pctText(x.co),num(x.c,'completadas')+' actividades completadas / '+num(x.c,'elegibles')+' elegibles × 100','Mide cuánto se ejecutó. No confirma que la actividad haya producido un control eficaz.'));
+ if(x.p.length)metrics.push(kpi('Controles verificados',pctText(x.ver),num(x.p,'controles_verificados')+' controles verificados / '+num(x.p,'controles_programados')+' controles programados × 100','Verificar ejecución no es lo mismo que demostrar eficacia de la medida.'));
+ if(x.t.length){
+  metrics.push(kpi('Descanso efectivo',pctText(x.desc),num(x.t,'personas_descanso_efectivo')+' personas / '+num(x.t,'personas_elegibles')+' elegibles × 100','Contrastar con documentos y disfrute efectivo; un dato faltante no prueba incumplimiento.'));
+  metrics.push(kpi('Días de vacaciones disfrutados',pctText(x.vac),num(x.t,'dias_vacaciones_disfrutados')+' días disfrutados / '+num(x.t,'dias_vacaciones_programados')+' días programados × 100','Indica proporción de días, no proporción de trabajadores.'));
+ }
+ const psy=effective.psicosocial||[];
+ if(psy.length){
+  const valid=psy.filter(z=>z.personas_elegibles>=5&&z.personas_evaluadas>=5);
+  metrics.push(kpi('Vigilancia psicosocial',psy.length+' registros','Por área × factor × método × período',valid.length?'Las señales deben interpretarse por separado. Algunas celdas pueden reservarse para proteger la confidencialidad.':'No se presentan recuentos de personas por grupos pequeños. No equivale a diagnóstico.'));
+ }
+ const metricsHTML=metrics.length?'<div class="pdf-indicator-grid">'+metrics.join('')+'</div>':'<p class="pdf-empty">No hay registros comparables para producir indicadores. Primero carga una fuente de información y define su población, período y criterio.</p>';
+ const conditions=x.m.length?'Condición: '+esc(filter.condition||'Definida en registros')+' · Personas evaluadas: '+num(x.m,'poblacion_evaluada')+'.':'La población evaluada debe documentarse en los registros por área y evento.';
+ const quality=[
+ ['Período y área',period==='Sin período'?'Pendiente de seleccionar':'Referencia: '+period+' · '+area],
+ ['Fuentes y unidades',withData.length?withData.map(k=>DATA_TYPES[k].short+' ('+effective[k].length+' registros)').join('; '):'Sin fuentes cargadas para los filtros actuales'],
+ ['Calidad de la información','Revisar registros duplicados, fecha de corte, criterios de caso, completitud y cambios en población antes de comparar resultados.'],
+ ['Denominadores','Personas, consultas, eventos, horas, evaluaciones y días NO son unidades intercambiables.']
+ ];
+ const qualityHTML='<dl class="pdf-facts">'+quality.map(([term,desc])=>'<div><dt>'+esc(term)+'</dt><dd>'+esc(desc)+'</dd></div>').join('')+'</dl>';
+ const interpretations=r.notes.length?'<div class="pdf-reading">'+r.notes.map(t=>'<p>'+esc(t)+'</p>').join('')+'</div>':'<p class="pdf-empty">No hay hallazgos calculados para interpretar. La ausencia de registros no significa ausencia de eventos.</p>';
+ const actionCards=actions.length?'<div class="pdf-actions">'+actions.map((a,i)=>{
+  const verified=a.status==='Verificada'&&a.verificationEvidence&&a.verificationResult;
+  return '<article class="pdf-action"><div class="pdf-action-head"><b>Medida '+(i+1)+' · '+esc(a.priority||'Prioridad por definir')+'</b><span>'+esc(a.status||'Pendiente')+'</span></div>'+
+  '<p><strong>Hallazgo:</strong> '+esc(a.finding)+'</p>'+
+  '<p><strong>Decisión preventiva:</strong> '+esc(a.measure)+'</p>'+
+  '<p><strong>Responsable:</strong> '+esc(a.owner)+' · <strong>Fecha prevista:</strong> '+esc(a.due||'Pendiente')+'</p>'+
+  '<p><strong>Evidencia prevista:</strong> '+esc(a.evidence||'No definida')+'</p>'+
+  '<p class="pdf-check"><strong>Resultado de verificación:</strong> '+(verified?esc(a.verificationResult)+' · Soporte: '+esc(a.verificationEvidence):'Pendiente de comprobar desempeño y documentar el resultado, no solo ejecutar la actividad.')+'</p></article>';
+ }).join('')+'</div>':'<p class="pdf-empty">No se han documentado acciones. Tras interpretar los hallazgos, define medidas sobre la fuente o la organización del trabajo, asigna responsable y criterio verificable.</p>';
+ const verified=actions.filter(z=>z.status==='Verificada'&&z.verificationEvidence&&z.verificationResult).length;
+ const next=withData.length===0?'1. Importar un primer registro colectivo. 2. Verificar población y período. 3. Analizar resultados.':actions.length===0?'1. Priorizar un hallazgo. 2. Definir controles y responsables. 3. Programar evidencia de verificación.':verified===0?'1. Revisar medidas pendientes. 2. Comparar resultados posteriores con un criterio técnico. 3. Registrar la evidencia.':'1. Comparar resultados antes y después de las medidas. 2. Registrar desvíos y decidir si reabrir acciones. 3. Programar el siguiente ciclo de vigilancia.';
+ const html='<article class="guided-pdf">'+
+ '<header class="pdf-header"><div class="pdf-brand">LA MOVIDA DE SST <span>+</span><small>ACADEMIA · DE LA REACCIÓN A LA PREVENCIÓN</small></div><div class="pdf-document-kind">INFORME GUIADO<br>DE VIGILANCIA</div></header>'+
+ '<h1>Del dato a la decisión preventiva</h1>'+
+ '<p class="pdf-deck">Diseño inicial, fuentes, indicadores, interpretación, medidas y verificación del SVE.</p>'+
+ '<div class="pdf-meta"><b>'+esc(r.name||'Centro de trabajo pendiente de identificar')+'</b><span>Período: '+esc(period)+' · Área: '+esc(area)+'</span><span>'+esc(r.label)+' · Generado: '+esc(new Date().toLocaleDateString('es-VE'))+'</span></div>'+
+ step('01','Definir el problema y la población','Primero aclara qué quieres conocer y qué decisión debe orientar la vigilancia.',
+ '<dl class="pdf-facts"><div><dt>Pregunta y objetivo</dt><dd>'+word(reportDesign.question)+'</dd></div><div><dt>Evento o caso a vigilar</dt><dd>'+word(reportDesign.definition)+'</dd></div><div><dt>Población / alcance</dt><dd>'+conditions+'</dd></div><div><dt>Señal que activa la respuesta</dt><dd>'+word(reportDesign.alert)+'</dd></div></dl>')+
+ step('02','Identificar y validar las fuentes','Define de dónde salen los datos, su unidad y si son comparables antes de calcular.',qualityHTML)+
+ step('03','Calcular indicadores','Lee numerador, denominador, unidad y período. Un valor sin estas referencias puede inducir a errores.',metricsHTML)+
+ step('04','Interpretar sin atribuir causas apresuradamente','El dato describe una señal; una asociación estadística no constituye una prueba causal.',interpretations+'<p class="pdf-caution"><strong>Límite:</strong> síntomas reportados, consultas, diagnósticos y enfermedades ocupacionales calificadas son categorías diferentes. Investiga exposición, temporalidad, sesgos y explicaciones alternativas; controla peligros identificados sin esperar certeza absoluta.</p>')+
+ step('05','Priorizar y decidir medidas preventivas','Del hallazgo a una acción concreta con responsable, plazo y evidencia esperada.',actionCards)+
+ step('06','Comprobar la eficacia y dar seguimiento','Una medida ejecutada o una inspección completada no equivale por sí sola a un riesgo controlado.',
+ '<div class="pdf-next"><strong>Acciones documentadas:</strong> '+actions.length+' · <strong>Con resultado y soporte de verificación:</strong> '+verified+'.<p>Al verificar, compara la condición posterior con el criterio técnico u operativo definido; si persiste la exposición o la información es insuficiente, reabre o ajusta la medida.</p></div>')+
+ step('07','Preparar el siguiente ciclo','El SVE es continuo: recoge, analiza, actúa, comprueba y vuelve a vigilar.','<p class="pdf-next">'+esc(next)+'</p>')+
+ '<footer class="pdf-footer">La Academia Movida de SST · www.movidasst.com · Informe elaborado localmente con datos agregados. Documento de apoyo técnico, no es formato oficial de consignación ni prueba por sí solo cumplimiento legal.</footer>'+
+ '</article>';
+ $('#printSheet').innerHTML=html;
+}
 function exportAll(){if(window.XLSX){const wb=XLSX.utils.book_new();for(const [k,m] of Object.entries(DATA_TYPES)){const arr=[m.columns,...db[k].map(r=>m.columns.map(c=>r[c]))],ws=XLSX.utils.aoa_to_sheet(arr);ws['!cols']=m.columns.map(c=>({wch:Math.max(16,c.length+2)}));XLSX.utils.book_append_sheet(wb,ws,k)}const actionHeads=['componente','prioridad','hallazgo','medida','responsable','fecha_verificacion','evidencia','estado'];XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([actionHeads,...actions.map(a=>[a.module,a.priority,a.finding,a.measure,a.owner,a.due,a.evidence,a.status])]),'acciones');XLSX.writeFile(wb,'SVE_Movida_Respaldo.xlsx');notify('Archivo Excel con todas las hojas descargado.')}else{for(const k of Object.keys(DATA_TYPES))dl(datasetCSV(k),'SVE_'+k+'.csv','text/csv;charset=utf-8');exportActionsCSV();notify('Descargué los CSV. Para Excel conecta a internet.')}}
 function exportActionsCSV(){dl('\ufeff'+makeCSV([['componente','prioridad','hallazgo','medida','responsable','fecha_verificacion','evidencia','estado'],...actions.map(a=>[a.module,a.priority,a.finding,a.measure,a.owner,a.due,a.evidence,a.status])]),'SVE_acciones.csv','text/csv;charset=utf-8')}
 function demo(){if(window.SVEDemo&&typeof window.SVEDemo.load==='function')return window.SVEDemo.load();notify('La demostración no está disponible. Actualiza la página.');}
