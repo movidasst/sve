@@ -83,10 +83,10 @@ function reportNumbers(c){
   }else missing.push('Sin consolidado de enfermedades comunes, ocupacionales y accidentes comunes.');
   if(work.length){
    const accidents=S(work,'accidentes'),incidents=S(work,'incidentes'),hours=S(work,'horas_trabajadas');
-   add('Accidentes e incidentes de trabajo',safeCount(accidents,publicVersion)+' accidentes de trabajo; '+safeCount(incidents,publicVersion)+' incidentes; '+v(hours)+' horas de trabajo agregadas. Indicador operativo de eventos por millón de horas: '+(hours? v(accidents*1e6/hours):'No calculable')+'. No corresponde a incidencia acumulada de personas.');
+   add('Accidentes e incidentes de trabajo',safeCount(accidents,publicVersion)+' accidentes de trabajo; '+safeCount(incidents,publicVersion)+' incidentes; '+v(hours)+' horas de trabajo agregadas. Indicador operativo de eventos por millón de horas: '+(publicVersion&&accidents>0&&accidents<5?'Reservado (grupo pequeño)':hours? v(accidents*1e6/hours):'No calculable')+'. No corresponde a incidencia acumulada de personas.');
   }else missing.push('Sin datos de accidentes e incidentes de trabajo.');
   if(repos.length){const by={};for(const r of repos){let v0=by[r.origen]||[0,0];v0[0]+=r.episodios;v0[1]+=r.dias_reposo;by[r.origen]=v0}
-   add('Reposos por origen',Object.entries(by).map(([key,a])=>key+': '+safeCount(a[0],publicVersion)+' episodios y '+v(a[1])+' días').join(' · ')+'.');}
+   add('Reposos por origen',Object.entries(by).map(([key,a])=>key+': '+safeCount(a[0],publicVersion)+' episodios y '+(publicVersion&&a[0]>0&&a[0]<5?'días reservados':v(a[1])+' días')).join(' · ')+'.');}
   else missing.push('Sin información agregada de reposos comunes y laborales.');
   if(health.length)add('Exámenes, referencias y discapacidad','Exámenes realizados: '+v(S(health,'examenes_realizados'))+'; resultados que requieren seguimiento: '+safeCount(S(health,'resultados_con_seguimiento'),publicVersion)+'; referencias especializadas: '+safeCount(S(health,'referencias_especializadas'),publicVersion)+'; personas con discapacidad (por cortes mensuales, no personas únicas trimestrales): '+(m.length===1?safeCount(S(health,'personas_con_discapacidad'),publicVersion):'ver por mes')+'.');
   else missing.push('Sin registros de exámenes, referencias y discapacidad.');
@@ -141,7 +141,7 @@ function makeReport(c){
  const activeEvidence=LEGAL.filter(req=>present(req,c.months)).length;
  const reviewed=LEGAL.filter(req=>{const x=evidence[req[0]]||{};return x.status==='Disponible'&&!!String(x.reference||'').trim()}).length;
  const evidenceNarrative='La matriz identifica '+activeEvidence+' campos con registros agregados y '+reviewed+' requisitos con evidencia declarada disponible/revisada, sobre '+LEGAL.length+' puntos de revisión. Esto no constituye una calificación legal de cumplimiento.';
- const table='<table class="rpt-tbl"><thead><tr><th>Medida / hallazgo</th><th>Responsable por función</th><th>Verificación</th><th>Conclusión</th></tr></thead><tbody>'+(d.actionSubset.length?d.actionSubset.map(a=>'<tr><td><strong>'+h(a.finding)+'</strong><br>'+h(a.measure)+'</td><td>'+h(a.owner)+'</td><td>'+h(a.due)+'<br>'+h(a.status)+'</td><td>'+h(a.verificationResult||'Sin resultado documentado')+'</td></tr>').join(''):'<tr><td colspan="4">Sin medidas documentadas.</td></tr>')+'</tbody></table>';
+ const table=publicVersion?'<p>El detalle de acciones y evidencias se mantiene en el informe interno, no en la versión destinada a divulgación pública.</p>':'<table class="rpt-tbl"><thead><tr><th>Medida / hallazgo</th><th>Responsable por función</th><th>Verificación</th><th>Conclusión</th></tr></thead><tbody>'+(d.actionSubset.length?d.actionSubset.map(a=>'<tr><td><strong>'+h(a.finding)+'</strong><br>'+h(a.measure)+'</td><td>'+h(a.owner)+'</td><td>'+h(a.due)+'<br>'+h(a.status)+'</td><td>'+h(a.verificationResult||'Sin resultado documentado')+'</td></tr>').join(''):'<tr><td colspan="4">Sin medidas documentadas.</td></tr>')+'</tbody></table>';
  const demoMode=(typeof isDemo!=='undefined')&&!!isDemo;
  return '<article class="sve-document"><div class="rpt-head"><div class="rpt-kicker">LA MOVIDA DE SST · DE LA REACCIÓN A LA PREVENCIÓN</div><h2>'+h(type.title)+'</h2><div class="rpt-sub">'+h(type.base)+'</div></div>'+
  '<div class="rpt-disclaimer"><strong>Alcance del documento.</strong> '+h(type.scope)+' '+(demoMode?'AVISO: LOS DATOS SON FICTICIOS.':'')+'</div>'+
@@ -153,7 +153,7 @@ function makeReport(c){
  '<h3>5. Acciones y comprobación</h3>'+table+
  '<h3>6. Participación y documentación</h3><p>Participación institucional: '+h(c.participation==='con'?'Se declara disponible acta o evidencia':c.participation==='revision'?'Revisión en proceso':'Pendiente de documentar')+'. '+h(evidenceNarrative)+'</p>'+
  '<h3>7. Datos o evidencias pendientes</h3>'+(miss?'<ul>'+miss+'</ul>':'<p>No se identificaron faltantes de carga para los componentes revisados; comprobar registros, soportes y suficiencia de datos antes de circular el informe.</p>')+
- '<h3>8. Matriz de correspondencia normativa</h3>'+matrixHtml(c,false)+
+ (publicVersion?'<h3>8. Resguardo documental</h3><p>La matriz de evidencias y los documentos internos no se incluyen en la versión de divulgación.</p>':'<h3>8. Matriz de correspondencia normativa</h3>'+matrixHtml(c,false))+
  '<p class="rpt-limit"><b>Confidencialidad:</b> no publicar información desagregada que permita identificar personas. Para grupos pequeños se reservan valores en el informe mensual de divulgación. Los registros agregados no sustituyen historias médicas individuales ni los formularios y trámites ante INPSASEL.</p>'+
  '<div class="rpt-signatures"><div>Revisado por Servicio SST / firma externa</div><div>Participación de representantes / constancia externa</div></div>'+
  '<footer>Elaborado por David Linares Brea · Academia Movida de SST · www.movidasst.com · Documento técnico generado localmente</footer></article>';
@@ -172,8 +172,8 @@ function getSheets(){
  const sheets=[];
  sheets.push({name:'Informe',data:[['Campo','Valor'],['Documento',reportType[c.type].title],['Empresa',c.org],['Meses',c.months.join(', ')],['Unidad responsable',c.responsible],['Método',c.method],['Interpretación',c.decision],['Precisión','Documento técnico no oficial'],...d.out.map(x=>[x.head,x.desc])]});
  sheets.push({name:'Matriz normativa',data:[['Código','Base normativa','Tema','Datos cargados','Estado de evidencia','Referencia'],...LEGAL.map(q=>[q[0],q[1],q[2],present(q,c.months)?'Sí':'No',(evidence[q[0]]||{}).status||'Pendiente',(evidence[q[0]]||{}).reference||''])]});
- sheets.push({name:'Acciones',data:[['Hallazgo','Medida','Responsable','Fecha','Estado','Evidencia de verificación','Resultado'],...d.actionSubset.map(x=>[x.finding,x.measure,x.owner,x.due,x.status,x.verificationEvidence||'',x.verificationResult||''])]});
- for(const k of d.sourceKeys){const def=DATA_TYPES[k],r=rows(k,c.months);sheets.push({name:k.slice(0,31),data:[def.columns,...r.map(a=>def.columns.map(key=>a[key]))]})}
+ if(c.type!=='mensual')sheets.push({name:'Acciones',data:[['Hallazgo','Medida','Responsable','Fecha','Estado','Evidencia de verificación','Resultado'],...d.actionSubset.map(x=>[x.finding,x.measure,x.owner,x.due,x.status,x.verificationEvidence||'',x.verificationResult||''])]});
+ if(c.type!=='mensual')for(const k of d.sourceKeys){const def=DATA_TYPES[k],r=rows(k,c.months);sheets.push({name:k.slice(0,31),data:[def.columns,...r.map(a=>def.columns.map(key=>a[key]))]})}
  return sheets;
 }
 function exportExcel(){
