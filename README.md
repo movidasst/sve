@@ -9,13 +9,40 @@ Definir → Registrar → Validar → Calcular → Interpretar → Actuar → Ve
 
 ## Funciones
 - Aplicación responsive con barra inferior fija y cinco pestañas: Inicio, Datos, Indicadores, Acciones, Informes.
-- Plantillas **CSV y Excel** para cinco componentes: morbilidad, accidentes, procesos peligrosos, tiempo libre y cobertura.
+- Plantillas **CSV y Excel** para once componentes, incluidos los seis nuevos bloques normativos: morbilidad, accidentes, procesos peligrosos, tiempo libre y cobertura.
 - Carga local de datos estructurados con validaciones; rechaza columnas de identificación personal y duplicados se actualizan por clave.
 - Prevalencia puntual, incidencia acumulada condicionada a cohorte y seguimiento, conteo de consultas, frecuencia operativa de accidentes, verificación de controles, descanso efectivo, vacaciones y cobertura.
 - Selección de período, área, condición de morbilidad y actividad de cobertura.
 - Listado de acciones con responsables por función, prioridad, fecha de verificación y evidencia.
 - Exportación de un Excel con hojas, respaldos CSV e impresión de informe a PDF («Guardar como PDF»).
 - Demostración con datos ficticios claramente identificados.
+
+## Versión normativa — Informes técnicos y matriz (octubre 2026)
+
+Además de las cinco plantillas iniciales, esta versión incorpora seis nuevas plantillas agregadas:
+- **Enfermedades y accidentes comunes**: clasificación diferenciada de enfermedades comunes, enfermedades ocupacionales calificadas, sospechas y accidentes comunes.
+- **Reposos**: episodios y días, según origen documentado.
+- **Salud complementaria**: exámenes de salud, resultados que necesitan seguimiento, referencias especializadas y personas con discapacidad, solamente totales colectivos.
+- **Mediciones**: cantidad de mediciones ocupacionales/ambientales y revisión frente a criterios técnicos documentados.
+- **Controles**: fuente, ambiente y trabajadores, con implementación y verificación.
+- **Jornada detallada**: horas, alimentación, descansos obligatorios/convencionales, vacaciones y actividades recreativas. Son **consolidados**; los registros por trabajador exigidos en el art. 36 deben conservarse fuera de GitHub Pages en un sistema protegido.
+
+### Informes disponibles
+En **Informes → Generador documental SVE** elige:
+1. **Divulgación mensual colectiva de vigilancia de salud** (NT-04:2023, sección 2.6).
+2. **Soporte técnico trimestral de accidentes y enfermedades** (Reglamento Parcial de la LOPCYMAT, art. 34).
+3. **Soporte técnico trimestral de utilización del tiempo libre** (art. 36).
+4. **Consolidado integral interno** para decisiones preventivas.
+
+Cada informe ofrece **PDF** mediante impresión del navegador, **Word editable (.doc)** y **Excel (.xlsx)** con las series de origen, medidas y matriz (si la librería XLSX está disponible). Los informes trimestrales **NO son formularios oficiales**, **NO equivalen a consignación ante INPSASEL** y **NO certifican cumplimiento legal**. Verifica el formato y canal oficial vigente con la autoridad.
+
+### Matriz documental
+Se presentan 21 puntos de revisión con base normativa. La aplicación distingue:
+- **Datos cargados:** existe al menos un registro agregado relacionado en el período.
+- **Evidencia declarada disponible/revisada:** la persona usuaria seleccionó ese estado y consignó una referencia documental.
+- **Pendiente o no aplica:** requiere justificación y revisión profesional.
+
+La matriz **no asigna una calificación automática de cumplimiento**. La historia de salud debe permanecer en custodia profesional fuera de esta web. Las acciones solo pueden marcarse **«Verificada»** después de introducir referencia de evidencia y resultado de la comprobación.
 
 ## Instrucciones de uso
 1. En la pestaña Datos selecciona componente y descarga la plantilla Excel o CSV.
