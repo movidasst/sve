@@ -1,0 +1,20 @@
+{
+  "name": "SVE | Laboratorio Movida SST",
+  "short_name": "SVE Movida",
+  "description": "Vigilancia epidemiológica: datos agregados, indicadores y prevención",
+  "id": "/sve/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f8fa",
+  "theme_color": "#00205b",
+  "lang": "es-VE",
+  "icons": [
+    {
+      "src": "https://www.movidasst.com/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
