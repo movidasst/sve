@@ -248,12 +248,12 @@ function renderReport(){
  const steps=[
  ['1. Definir',defined+'/3 respuestas'],['2. Registrar',total+' registros'],
  ['3. Calcular',r.notes.length+' lecturas'],['4. Interpretar','Con límites'],
- ['5. Actuar',actions.length+' acciones'],['6. Verificar',actions.filter(a=>a.status==='Verificada').length+' verificadas']
+ ['5. Actuar',actions.length+' acciones'],['6. Verificar',actions.filter(a=>a.status==='Verificada').length+' verificadas'],['7. Mejorar','Nuevo ciclo']
  ];
  $('#reportPreview').innerHTML='<div class="eyebrow teal">'+htmlEsc(r.label)+'</div>'+
  '<h2 style="margin:8px 0">Vista previa · Informe guiado de vigilancia</h2>'+
  '<p class="r-sub">'+htmlEsc(r.name||'Centro de trabajo pendiente')+' · '+htmlEsc(r.period)+' · '+htmlEsc(filter.area||'Todas las áreas')+'</p>'+
- '<p class="muted">El PDF sigue seis etapas de trabajo, no comienza directamente con una tabla de cifras. Si faltan definiciones o registros, aparecerán como pendientes.</p>'+
+ '<p class="muted">El PDF sigue siete etapas de trabajo, no comienza directamente con una tabla de cifras. Si faltan definiciones o registros, aparecerán como pendientes.</p>'+
  '<div class="report-stage-grid">'+steps.map(([a,b])=>'<div><strong>'+htmlEsc(a)+'</strong><span>'+htmlEsc(b)+'</span></div>').join('')+'</div>'+
  '<h3>Qué se incluirá</h3><p class="muted">'+htmlEsc(r.notes.length?'Indicadores y hallazgos, denominadores, limitaciones, '+actions.length+' acciones preventivas y criterios de verificación.':'Todavía no hay datos para calcular. El documento contendrá tu diseño inicial y los campos que faltan por completar.')+'</p>';
 }
