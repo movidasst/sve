@@ -115,7 +115,11 @@ function loadDemo(){
  if(!backupNow())return false;
  try{
   const dataset=populate(),actionList=demoActions(),ev=demoEvidence();
-  localStorage.setItem(APP_KEY,JSON.stringify({db:dataset,actions:actionList,isDemo:true}));
+  localStorage.setItem(APP_KEY,JSON.stringify({db:dataset,actions:actionList,isDemo:true,reportDesign:{
+    question:'¿En qué áreas se concentran las molestias musculoesqueléticas, los síntomas respiratorios y las fallas de controles, y qué decisiones de prevención requieren?',
+    definition:'Registro colectivo mensual de personas con síntomas informados, condiciones por área y período, sin identificar a trabajadores ni asumir origen ocupacional.',
+    alert:'Concentración de reportes en una tarea, cambio relevante entre períodos o control técnico que no cumple su criterio: activar revisión de fuentes y medidas.'
+  }}));
   localStorage.setItem(EVIDENCE_KEY,JSON.stringify(ev));
   localStorage.setItem(CONFIG_KEY,JSON.stringify(DEMO_CONFIG));
  }catch(e){
