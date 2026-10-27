@@ -42,7 +42,31 @@
       <div class="hero-actions"><button class="btn yellow" id="goLoad" type="button">Comenzar con mis datos <span aria-hidden="true">›</span></button><button class="btn outline-light" id="goDemo" type="button">Explorar un caso de ejemplo</button></div>
     </div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="pulse-mark">SVE<span>360°</span></div><span class="hero-dot dot1"></span><span class="hero-dot dot2"></span></div>
   </div>
-  <section class="demo-mode-panel" id="demoModePanel" aria-label="Demostración completa del SVE">
+  
+  <section class="card setup-card" id="sveSetup" aria-labelledby="sveSetupTitle">
+    <div class="setup-heading"><span class="eyebrow teal">PASO 1 · DEFINIR</span><h2 id="sveSetupTitle">Empieza por la pregunta de vigilancia</h2><p>Antes de cargar cifras, explica qué necesitas comprender y para qué tomarás decisiones. Este primer diseño es modificable.</p></div>
+    <div class="report-wizard-guide" aria-label="Secuencia para construir el informe SVE">
+      <strong>Tu primera tarea: define el SVE antes de calcular</strong>
+      <ol>
+        <li><b>Definir</b> problema, población, evento y período</li>
+        <li><b>Registrar</b> fuentes, variables y calidad</li>
+        <li><b>Calcular</b> indicadores con denominadores correctos</li>
+        <li><b>Interpretar</b> hallazgos sin confundir asociación con causalidad</li>
+        <li><b>Decidir</b> prioridades y controles preventivos</li>
+        <li><b>Verificar</b> resultados y ajustar la vigilancia</li>
+      </ol>
+    </div>
+    <div class="field"><label for="reportOrganization">Empresa o centro de trabajo (sin datos personales)</label><input id="reportOrganization" maxlength="95" placeholder="Ej.: Talleres Horizonte"></div>
+    <div class="report-design-fields">
+      <div class="field"><label for="reportQuestion">Paso 1 · ¿Qué situación queremos vigilar y para qué? (opcional)</label><textarea id="reportQuestion" maxlength="450" rows="2" placeholder="Ej.: Vigilar molestias oculares en mantenimiento para orientar controles sobre la exposición."></textarea></div>
+      <div class="field"><label for="reportCaseDefinition">Paso 2 · ¿Qué se contará como evento o caso? (opcional)</label><textarea id="reportCaseDefinition" maxlength="450" rows="2" placeholder="Ej.: Persona que reporta irritación ocular durante el mes; los reportes no se consideran diagnósticos."></textarea></div>
+      <div class="field"><label for="reportAlert">Paso 3 · ¿Qué señal activa investigación o acción? (opcional)</label><textarea id="reportAlert" maxlength="450" rows="2" placeholder="Ej.: Agrupación de reportes en una tarea o falla de extracción; priorizar medidas según el peligro."></textarea></div>
+    </div>
+    <p class="fine-print">Puedes completar el diseño poco a poco. Los datos quedan guardados en este navegador y aparecerán en el informe guiado. No escribas nombres ni diagnósticos individuales.</p>
+    <div class="button-line"><button type="button" class="btn primary" id="continueToData">Continuar: registrar datos <span aria-hidden="true">›</span></button><span id="designSaved" class="muted subtle-save" aria-live="polite">Se guarda automáticamente en este dispositivo.</span></div>
+  </section>
+  <div class="context-guide next-action" id="guidedNext" aria-live="polite"></div>
+<section class="demo-mode-panel" id="demoModePanel" aria-label="Demostración completa del SVE">
    <div class="demo-mode-mark" aria-hidden="true">▤</div>
    <div class="demo-mode-body"><span class="eyebrow teal">ENTORNO DE PRUEBAS · 100 % DATOS FICTICIOS</span><h2 id="demoModeTitle">Prueba un SVE completo, sin ingresar datos reales</h2><p id="demoModeCopy">Carga un trimestre simulado con los registros, indicadores, exámenes médicos, acciones e informes para explorar toda la aplicación.</p><p id="demoStats" class="demo-stats">Trimestre ficticio julio–septiembre 2026 · sin datos personales</p>
    <div class="demo-controls"><button class="btn primary" type="button" id="loadCompleteDemo">▶ Cargar demostración completa</button><button class="btn secondary" type="button" id="goDemoReports">Ver informes de la demostración</button><button class="btn danger-outline" id="exitCompleteDemo" type="button" hidden>✕ Borrar demo y comenzar con mis datos</button></div></div>
@@ -68,6 +92,15 @@
 
 <section id="panel-datos" class="panel" aria-labelledby="titulo-datos">
   <div class="page-lead"><span class="eyebrow teal">PASO 02 · REGISTRAR Y VALIDAR</span><h1 id="titulo-datos">Prepara tus datos</h1><p>Selecciona el componente del SVE, descarga su formato y carga los registros. Una fila representa un área y un período para un evento o actividad definidos.</p></div>
+  <div id="dataGuide" class="context-guide" aria-live="polite"></div>
+  <div class="component-shortcuts" aria-label="Elegir por dónde comenzar">
+    <span class="component-shortcuts-title">Quiero vigilar:</span>
+    <button class="shortcut" type="button" data-select-dataset="morbilidad">Salud y síntomas</button>
+    <button class="shortcut" type="button" data-select-dataset="procesos">Procesos peligrosos</button>
+    <button class="shortcut" type="button" data-select-dataset="psicosocial">Organización y psicosocial</button>
+    <button class="shortcut" type="button" data-select-dataset="tiempo">Jornadas y descanso</button>
+  </div>
+
   <div class="card">
     <div class="field"><label for="datasetSelect">Componente que vas a trabajar</label><select id="datasetSelect"></select></div>
     <div class="dataset-help"><h2 id="datasetTitle">Morbilidad y salud</h2><p id="datasetExplain"></p></div>
@@ -93,6 +126,8 @@
 
 <section id="panel-indicadores" class="panel" aria-labelledby="titulo-indicadores">
   <div class="page-lead"><span class="eyebrow teal">PASOS 03–05 · CALCULAR E INTERPRETAR</span><h1 id="titulo-indicadores">Indicadores de vigilancia</h1><p>Los resultados expresan exactamente lo que miden los registros. Comparar no significa demostrar causalidad.</p></div>
+  <div id="indicatorGuide" class="context-guide" aria-live="polite"></div>
+
   <div class="card filter-card">
     <div class="filter-grid"><div class="field"><label for="periodFilter">Período</label><select id="periodFilter"></select></div><div class="field"><label for="areaFilter">Área</label><select id="areaFilter"></select></div><div class="field"><label for="conditionFilter">Condición vigilada</label><select id="conditionFilter"></select></div><div class="field"><label for="activityFilter">Actividad de cobertura</label><select id="activityFilter"></select></div></div>
     <p id="filterNote" class="fine-print"></p>
@@ -118,6 +153,8 @@
 
 <section id="panel-acciones" class="panel" aria-labelledby="titulo-acciones">
   <div class="page-lead"><span class="eyebrow teal">PASOS 06–07 · ACTUAR Y VERIFICAR</span><h1 id="titulo-acciones">De hallazgos a medidas</h1><p>Registra decisiones que puedan comprobarse: qué problema abordar, qué se hará, quién es responsable y cuándo verificar los resultados.</p></div>
+  <div id="actionGuide" class="context-guide" aria-live="polite"></div>
+
   <div class="card"><h2>Nueva acción preventiva</h2>
     <form id="actionForm" class="form-grid">
       <div class="field"><label for="aModule">Componente</label><select id="aModule"></select></div>
@@ -136,25 +173,11 @@
 
 <section id="panel-informes" class="panel" aria-labelledby="titulo-informes">
   <div class="page-lead"><span class="eyebrow teal">EVIDENCIA Y COMUNICACIÓN</span><h1 id="titulo-informes">Informe del SVE</h1><p>Prepara resultados para reuniones técnicas, seguimiento y toma de decisiones. Los informes incluyen definiciones y advertencias de interpretación.</p></div>
+  <div class="context-guide"><strong>Informe guiado</strong><p>Utiliza los datos que registraste y las acciones de seguimiento. Primero verás el propósito y las fuentes, luego los cálculos, su interpretación y lo que conviene hacer.</p><button type="button" class="btn quiet mini" data-guide-tab="inicio">← Editar mi diseño inicial</button></div>
+
   <div class="card">
-    <div class="report-wizard-guide" aria-label="Secuencia para construir el informe SVE">
-      <strong>¿En qué orden se diseña y documenta un SVE?</strong>
-      <ol>
-        <li><b>Definir</b> problema, población, evento y período</li>
-        <li><b>Registrar</b> fuentes, variables y calidad</li>
-        <li><b>Calcular</b> indicadores con denominadores correctos</li>
-        <li><b>Interpretar</b> hallazgos sin confundir asociación con causalidad</li>
-        <li><b>Decidir</b> prioridades y controles preventivos</li>
-        <li><b>Verificar</b> resultados y ajustar la vigilancia</li>
-      </ol>
-    </div>
-    <div class="field"><label for="reportOrganization">Empresa o centro de trabajo (sin datos personales)</label><input id="reportOrganization" maxlength="95" placeholder="Ej.: Talleres Horizonte"></div>
-    <div class="report-design-fields">
-      <div class="field"><label for="reportQuestion">Paso 1 · ¿Qué situación queremos vigilar y para qué? (opcional)</label><textarea id="reportQuestion" maxlength="450" rows="2" placeholder="Ej.: Vigilar molestias oculares en mantenimiento para orientar controles sobre la exposición."></textarea></div>
-      <div class="field"><label for="reportCaseDefinition">Paso 2 · ¿Qué se contará como evento o caso? (opcional)</label><textarea id="reportCaseDefinition" maxlength="450" rows="2" placeholder="Ej.: Persona que reporta irritación ocular durante el mes; los reportes no se consideran diagnósticos."></textarea></div>
-      <div class="field"><label for="reportAlert">Paso 3 · ¿Qué señal activa investigación o acción? (opcional)</label><textarea id="reportAlert" maxlength="450" rows="2" placeholder="Ej.: Agrupación de reportes en una tarea o falla de extracción; priorizar medidas según el peligro."></textarea></div>
-    </div>
-    <p class="fine-print">Estos tres campos ayudan a ordenar el informe. Se conservan en este navegador con tus registros. Si quedan vacíos, el PDF indicará «Pendiente de definir». No ingreses diagnósticos ni nombres individuales.</p>
+    <div id="reportGuideStatus" class="context-guide" aria-live="polite">El informe guiará desde el objetivo hasta la verificación. La ficha inicial se completa en Inicio.</div>
+
     <div class="button-line"><button id="printReport" class="btn primary" type="button">▤ Generar informe guiado (PDF)</button><button id="exportWorkbook" class="btn secondary" type="button">↓ Exportar Excel</button><button id="downloadBackup" class="btn quiet" type="button">↓ Respaldo CSV</button></div>
     <p class="fine-print">El PDF se obtiene mediante la función de impresión del navegador («Guardar como PDF»). Excel exporta las hojas de datos y de acciones.</p>
   </div>
