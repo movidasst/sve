@@ -255,3 +255,13 @@
 
 /* Ayudas de campo SVE - registro comprensible */
 .field-hint{display:block;margin-top:5px;color:#567386;font-size:.72rem;line-height:1.5}.manual-form .field label{line-height:1.4;font-weight:800}.manual-form .field input,.manual-form .field select{min-height:41px}
+
+/* Opciones avanzadas plegables — SVE */
+.advanced-formal{border:1px solid #d7e6e7;border-top:3px solid #8abfc0;border-radius:15px;background:#fff;padding:0;overflow:visible;box-shadow:0 4px 20px #00205b07}
+.advanced-summary{cursor:pointer;padding:19px 22px;list-style-position:inside;line-height:1.45;color:#00205b}
+.advanced-summary strong{font:800 1.08rem/1.4 Outfit,Arial,sans-serif}
+.advanced-summary small{display:block;font-size:.8rem;font-weight:550;color:#607486;margin:5px 0 0 19px}
+.advanced-summary:hover{background:#f3fafa}
+.advanced-formal[open]>.advanced-summary{border-bottom:1px solid #d9e8e9;background:#f1fafa}
+.advanced-content{padding:17px 20px 25px}
+@media(max-width:570px){.advanced-summary{padding:14px}.advanced-summary strong{font-size:.94rem}.advanced-summary small{margin-left:16px}.advanced-content{padding:12px}}
