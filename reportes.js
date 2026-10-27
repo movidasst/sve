@@ -171,7 +171,7 @@ function getSheets(){
  const c=(current||{...parameters()}),d=reportNumbers(c);
  const sheets=[];
  sheets.push({name:'Informe',data:[['Campo','Valor'],['Documento',reportType[c.type].title],['Empresa',c.org],['Meses',c.months.join(', ')],['Unidad responsable',c.responsible],['Método',c.method],['Interpretación',c.decision],['Precisión','Documento técnico no oficial'],...d.out.map(x=>[x.head,x.desc])]});
- sheets.push({name:'Matriz normativa',data:[['Código','Base normativa','Tema','Datos cargados','Estado de evidencia','Referencia'],...LEGAL.map(q=>[q[0],q[1],q[2],present(q,c.months)?'Sí':'No',(evidence[q[0]]||{}).status||'Pendiente',(evidence[q[0]]||{}).reference||''])]});
+ if(c.type!=='mensual')sheets.push({name:'Matriz normativa',data:[['Código','Base normativa','Tema','Datos cargados','Estado de evidencia','Referencia'],...LEGAL.map(q=>[q[0],q[1],q[2],present(q,c.months)?'Sí':'No',(evidence[q[0]]||{}).status||'Pendiente',(evidence[q[0]]||{}).reference||''])]});
  if(c.type!=='mensual')sheets.push({name:'Acciones',data:[['Hallazgo','Medida','Responsable','Fecha','Estado','Evidencia de verificación','Resultado'],...d.actionSubset.map(x=>[x.finding,x.measure,x.owner,x.due,x.status,x.verificationEvidence||'',x.verificationResult||''])]});
  if(c.type!=='mensual')for(const k of d.sourceKeys){const def=DATA_TYPES[k],r=rows(k,c.months);sheets.push({name:k.slice(0,31),data:[def.columns,...r.map(a=>def.columns.map(key=>a[key]))]})}
  return sheets;
