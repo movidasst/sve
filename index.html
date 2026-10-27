@@ -137,8 +137,25 @@
 <section id="panel-informes" class="panel" aria-labelledby="titulo-informes">
   <div class="page-lead"><span class="eyebrow teal">EVIDENCIA Y COMUNICACIÓN</span><h1 id="titulo-informes">Informe del SVE</h1><p>Prepara resultados para reuniones técnicas, seguimiento y toma de decisiones. Los informes incluyen definiciones y advertencias de interpretación.</p></div>
   <div class="card">
-    <div class="field"><label for="reportOrganization">Nombre de empresa o centro de trabajo (opcional)</label><input id="reportOrganization" maxlength="95" placeholder="Ej.: Talleres Horizonte (sin datos personales)"></div>
-    <div class="button-line"><button id="printReport" class="btn primary" type="button">▤ Generar PDF / Imprimir</button><button id="exportWorkbook" class="btn secondary" type="button">↓ Exportar Excel</button><button id="downloadBackup" class="btn quiet" type="button">↓ Respaldo CSV</button></div>
+    <div class="report-wizard-guide" aria-label="Secuencia para construir el informe SVE">
+      <strong>¿En qué orden se diseña y documenta un SVE?</strong>
+      <ol>
+        <li><b>Definir</b> problema, población, evento y período</li>
+        <li><b>Registrar</b> fuentes, variables y calidad</li>
+        <li><b>Calcular</b> indicadores con denominadores correctos</li>
+        <li><b>Interpretar</b> hallazgos sin confundir asociación con causalidad</li>
+        <li><b>Decidir</b> prioridades y controles preventivos</li>
+        <li><b>Verificar</b> resultados y ajustar la vigilancia</li>
+      </ol>
+    </div>
+    <div class="field"><label for="reportOrganization">Empresa o centro de trabajo (sin datos personales)</label><input id="reportOrganization" maxlength="95" placeholder="Ej.: Talleres Horizonte"></div>
+    <div class="report-design-fields">
+      <div class="field"><label for="reportQuestion">Paso 1 · ¿Qué situación queremos vigilar y para qué? (opcional)</label><textarea id="reportQuestion" maxlength="450" rows="2" placeholder="Ej.: Vigilar molestias oculares en mantenimiento para orientar controles sobre la exposición."></textarea></div>
+      <div class="field"><label for="reportCaseDefinition">Paso 2 · ¿Qué se contará como evento o caso? (opcional)</label><textarea id="reportCaseDefinition" maxlength="450" rows="2" placeholder="Ej.: Persona que reporta irritación ocular durante el mes; los reportes no se consideran diagnósticos."></textarea></div>
+      <div class="field"><label for="reportAlert">Paso 3 · ¿Qué señal activa investigación o acción? (opcional)</label><textarea id="reportAlert" maxlength="450" rows="2" placeholder="Ej.: Agrupación de reportes en una tarea o falla de extracción; priorizar medidas según el peligro."></textarea></div>
+    </div>
+    <p class="fine-print">Estos tres campos ayudan a ordenar el informe. Se conservan en este navegador con tus registros. Si quedan vacíos, el PDF indicará «Pendiente de definir». No ingreses diagnósticos ni nombres individuales.</p>
+    <div class="button-line"><button id="printReport" class="btn primary" type="button">▤ Generar informe guiado (PDF)</button><button id="exportWorkbook" class="btn secondary" type="button">↓ Exportar Excel</button><button id="downloadBackup" class="btn quiet" type="button">↓ Respaldo CSV</button></div>
     <p class="fine-print">El PDF se obtiene mediante la función de impresión del navegador («Guardar como PDF»). Excel exporta las hojas de datos y de acciones.</p>
   </div>
   <div id="reportPreview" class="report-preview"></div>
