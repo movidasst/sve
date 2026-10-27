@@ -47,7 +47,7 @@ const DATA_TYPES = {
     sample:[['2026-09','Operaciones','Evaluación de salud',50,44],['2026-09','Mantenimiento','Evaluación de salud',40,31],['2026-09','Administración','Evaluación de salud',30,27]]
   }
 };
-const STORE_KEY='movidasst_sve_v1';
+const STORE_KEY='movidasst_sve_v1';let installPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});
 const emptyDB=()=>Object.fromEntries(Object.keys(DATA_TYPES).map(k=>[k,[]]));
 let db=emptyDB(),actions=[],dataset='morbilidad',filter={period:'',area:'',condition:'',activity:''},isDemo=false,toastTimer;
 const $=(s,base=document)=>base.querySelector(s);
@@ -128,7 +128,7 @@ function ready(){
  $$('.nav-item').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
  $$('[data-tab]:not(.nav-item)').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
  $('#goLoad').addEventListener('click',()=>go('datos'));$('#goDemo').addEventListener('click',demo);$('#loadDemoReports').addEventListener('click',demo);
- $('#helpTop').addEventListener('click',()=>$('#helpDialog').showModal());
+ $('#helpTop').addEventListener('click',()=>$('#helpDialog').showModal());$('#installApp').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();try{await installPrompt.userChoice}catch(e){}installPrompt=null}else{alert('Para instalar SVE:\n\nAndroid (Chrome): abre el menú ⋮ y selecciona Instalar aplicación / Agregar a pantalla principal.\n\niPhone (Safari): toca Compartir → Añadir a pantalla de inicio.')}});
  $('#templateXLSX').addEventListener('click',()=>exportTemplate(dataset,true));$('#templateCSV').addEventListener('click',()=>exportTemplate(dataset,false));$('#sampleCSV').addEventListener('click',()=>dl('\ufeff'+makeCSV([DATA_TYPES[dataset].columns,...DATA_TYPES[dataset].sample]),'SVE_Ejemplo_'+dataset+'.csv','text/csv;charset=utf-8'));
  $('#uploadFile').addEventListener('change',e=>importFile(e.target.files[0]));
  const drop=$('#dropZone');['dragenter','dragover'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add('dragover')}));['dragleave','drop'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove('dragover')}));drop.addEventListener('drop',e=>importFile(e.dataTransfer.files[0]));
