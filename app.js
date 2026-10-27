@@ -100,6 +100,42 @@ function updateDatasetSelect(){
  $('#aModule').innerHTML=Object.entries(DATA_TYPES).map(([k,v])=>option(k,v.name,false)).join('');
 }
 function renderData(){const m=DATA_TYPES[dataset];$('#datasetSelect').value=dataset;$('#datasetTitle').textContent=m.name;$('#datasetExplain').textContent=m.description;$('#datasetRule').textContent='Cómo completar el formato: '+m.rule;$('#datasetCount').textContent=db[dataset].length;renderManualFields();renderDataTable();renderGuides()}
+const FIELD_TITLES={
+ periodo:'Período (AAAA-MM)',fecha_corte:'Fecha de corte',area:'Área de trabajo',condicion:'Condición de salud vigilada',proceso:'Proceso o tarea',
+ poblacion_evaluada:'Personas evaluadas',casos_existentes:'Personas con casos existentes',poblacion_en_riesgo:'Personas inicialmente en riesgo',
+ casos_nuevos:'Casos nuevos',consultas:'Consultas registradas',seguimiento_completo:'¿Se completó el seguimiento?',
+ accidentes:'Accidentes',incidentes:'Incidentes',horas_trabajadas:'Horas trabajadas',trabajadores:'Trabajadores',
+ inspecciones:'Inspecciones realizadas',hallazgos:'Hallazgos observados',controles_programados:'Controles planificados',
+ controles_verificados:'Controles cuya ejecución fue verificada',personas_elegibles:'Personas elegibles',
+ personas_evaluadas:'Personas que participaron',personas_con_senal:'Personas con señal según criterio',
+ factor:'Factor de organización del trabajo',metodo:'Método de evaluación',medidas_programadas:'Medidas previstas',
+ medidas_verificadas:'Medidas cuya ejecución fue verificada',elegibles:'Actividades o personas elegibles',
+ completadas:'Actividades completadas',actividad:'Actividad de vigilancia',tipo_evaluacion:'Tipo de evaluación',
+ programadas:'Evaluaciones programadas',realizadas:'Evaluaciones realizadas',realizadas_en_plazo:'Realizadas en el plazo aplicable',
+ con_seguimiento:'Evaluaciones con seguimiento',tipo:'Tipo',nivel:'Nivel de control',
+ personas_descanso_efectivo:'Personas con descanso efectivo',horas_extra:'Horas extraordinarias',
+ dias_vacaciones_programados:'Días de vacaciones programados',dias_vacaciones_disfrutados:'Días de vacaciones disfrutados',
+ resultados_con_seguimiento:'Resultados que requieren seguimiento',personas_afectadas:'Personas afectadas',
+ registros:'Episodios o registros',episodios:'Episodios',dias_reposo:'Días de reposo',referencia_tecnica:'Criterio técnico de referencia',
+ mediciones_realizadas:'Mediciones realizadas',mediciones_que_requieren_revision:'Mediciones que requieren revisión técnica',
+ programadas:'Evaluaciones programadas',implementadas:'Medidas implementadas',verificadas:'Medidas verificadas'
+};
+const FIELD_HINTS={
+ periodo:'Indica un mes, por ejemplo 2026-09. Mantén igual el período de los datos que deseas comparar.',
+ fecha_corte:'Día en que se identifican los casos existentes. Debe corresponder al período indicado.',
+ poblacion_en_riesgo:'Personas evaluadas menos quienes ya tenían la condición al inicio. No es el total de consultas.',
+ casos_existentes:'Personas que tenían la condición en la fecha de corte, no consultas acumuladas.',
+ casos_nuevos:'Personas que aparecen por primera vez con la condición durante el seguimiento definido.',
+ consultas:'Una persona puede consultar varias veces; no representa personas distintas.',
+ seguimiento_completo:'La incidencia acumulada simple se muestra solo cuando el seguimiento está declarado completo.',
+ personas_con_senal:'Personas cuyo resultado cumple un criterio de revisión previamente definido; no equivale a diagnóstico.',
+ controles_verificados:'Cuenta la verificación de ejecución. La eficacia exige además comprobar el desempeño.',
+ medidas_verificadas:'Cuenta la ejecución comprobada, no infiere automáticamente eficacia ni control del riesgo.',
+ elegibles:'Especifica en la actividad si la unidad de conteo son personas o actividades. No las mezcles.',
+ horas_trabajadas:'Horas del período que se usarán como denominador del indicador de accidentes.'
+};
+const fieldLabel=c=>FIELD_TITLES[c]||c.replaceAll('_',' ').replace(/^./,x=>x.toUpperCase());
+
 function renderManualFields(){
  const m=DATA_TYPES[dataset],sets={
   categoria:['Enfermedad común','Enfermedad ocupacional calificada','Sospecha de origen ocupacional','Accidente común'],
@@ -108,17 +144,17 @@ function renderManualFields(){
   tipo_evaluacion:['Ingreso','Prevacacional','Posvacacional','Egreso','Periódica por exposición','Anual programada','Otra programada']
  };
  $('#manualFields').innerHTML=m.columns.map(c=>{
-   const label='<label for="field_'+htmlEsc(c)+'">'+htmlEsc(c.replaceAll('_',' '))+'</label>';
+   const label='<label for="field_'+htmlEsc(c)+'">'+htmlEsc(fieldLabel(c))+'</label>';
    let field='';
    if(c==='seguimiento_completo')field='<select id="field_'+c+'" name="'+c+'" required><option value="si">Sí</option><option value="no">No</option></select>';
    else if(sets[c])field='<select id="field_'+c+'" name="'+c+'" required>'+sets[c].map((choice,i)=>'<option value="'+htmlEsc(choice)+'">'+htmlEsc(choice)+'</option>').join('')+'</select>';
    else field='<input id="field_'+htmlEsc(c)+'" name="'+htmlEsc(c)+'" type="'+(m.numeric.includes(c)?'number':'text')+'" '+(m.numeric.includes(c)?'min="0" step="1"':'maxlength="100"')+' '+(c==='periodo'?'pattern="[0-9]{4}-(0[1-9]|1[0-2])" placeholder="2026-09"':c==='fecha_corte'?'pattern="[0-9]{4}-(0[1-9]|1[0-2])-[0-9]{2}" placeholder="2026-09-01"':'')+' required>';
-   return '<div class="field">'+label+field+'</div>';
+   return '<div class="field">'+label+field+(FIELD_HINTS[c]?'<small class="field-hint">'+htmlEsc(FIELD_HINTS[c])+'</small>':'')+'</div>';
  }).join('');
 }
-function renderDataTable(){const m=DATA_TYPES[dataset],rows=db[dataset],cols=m.columns;$('#dataTableWrap').innerHTML=!rows.length?'<div class="empty-table">Todavía no hay registros. Descarga una plantilla o utiliza el formulario.</div>':'<table class="data-table"><thead><tr>'+cols.map(c=>'<th>'+htmlEsc(c.replaceAll('_',' '))+'</th>').join('')+'<th>Eliminar</th></tr></thead><tbody>'+rows.slice(-35).map(r=>'<tr>'+cols.map(c=>'<td>'+htmlEsc(r[c])+'</td>').join('')+'<td><button class="del-row" data-delete="'+htmlEsc(keyOf(dataset,r))+'" title="Eliminar fila">×</button></td></tr>').join('')+'</tbody></table>';$('#datasetCount').textContent=rows.length;$('#dataPreviewNote').textContent=rows.length>35?'Se muestran los últimos 35 de '+rows.length+' registros. Exporta el CSV para revisarlos todos.':'Los registros son resúmenes agregados, no historias individuales.'}
+function renderDataTable(){const m=DATA_TYPES[dataset],rows=db[dataset],cols=m.columns;$('#dataTableWrap').innerHTML=!rows.length?'<div class="empty-table">Todavía no hay registros. Descarga una plantilla o utiliza el formulario.</div>':'<table class="data-table"><thead><tr>'+cols.map(c=>'<th>'+htmlEsc(fieldLabel(c))+'</th>').join('')+'<th>Eliminar</th></tr></thead><tbody>'+rows.slice(-35).map(r=>'<tr>'+cols.map(c=>'<td>'+htmlEsc(r[c])+'</td>').join('')+'<td><button class="del-row" data-delete="'+htmlEsc(keyOf(dataset,r))+'" title="Eliminar fila">×</button></td></tr>').join('')+'</tbody></table>';$('#datasetCount').textContent=rows.length;$('#dataPreviewNote').textContent=rows.length>35?'Se muestran los últimos 35 de '+rows.length+' registros. Exporta el CSV para revisarlos todos.':'Los registros son resúmenes agregados, no historias individuales.'}
 function keyOf(k,r){return DATA_TYPES[k].key.map(f=>String(r[f]).trim().toLowerCase()).join('|')}
-function validate(k,input){const m=DATA_TYPES[k],r={};for(const c of m.columns){let x=input[c];if(x===undefined||x===null||String(x).trim()==='')return 'Falta el campo obligatorio: '+c;if(m.numeric.includes(c)){if(!/^\d+$/.test(String(x).trim()))return c+' debe ser un entero igual o mayor que 0';x=Number(x);if(!Number.isSafeInteger(x)||x>1e9)return c+' excede el rango permitido'}else{x=String(x).trim();if(x.length>100)return c+' tiene más de 100 caracteres';if(c==='periodo'&&!/^20\d{2}-(0[1-9]|1[0-2])$/.test(x))return 'periodo debe ser YYYY-MM (ejemplo: 2026-09)';if(c==='fecha_corte'&&(!/^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(x)||x.slice(0,7)!==String(input.periodo).trim()||!Number.isFinite(new Date(x+'T00:00:00').getTime())||new Date(x+'T00:00:00').toISOString().slice(0,10)!==x))return 'fecha_corte debe ser YYYY-MM-DD y corresponder al período';if(c==='seguimiento_completo'){x=norm(x);if(!['si','no'].includes(x))return 'seguimiento_completo: usa si o no'}if(!['periodo','seguimiento_completo'].includes(c)&&x.length<2)return c+' está incompleto'}r[c]=x}
+function validate(k,input){const m=DATA_TYPES[k],r={};for(const c of m.columns){let x=input[c];if(x===undefined||x===null||String(x).trim()==='')return 'Falta completar: '+fieldLabel(c);if(m.numeric.includes(c)){if(!/^\d+$/.test(String(x).trim()))return c+' debe ser un entero igual o mayor que 0';x=Number(x);if(!Number.isSafeInteger(x)||x>1e9)return c+' excede el rango permitido'}else{x=String(x).trim();if(x.length>100)return c+' tiene más de 100 caracteres';if(c==='periodo'&&!/^20\d{2}-(0[1-9]|1[0-2])$/.test(x))return 'periodo debe ser YYYY-MM (ejemplo: 2026-09)';if(c==='fecha_corte'&&(!/^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(x)||x.slice(0,7)!==String(input.periodo).trim()||!Number.isFinite(new Date(x+'T00:00:00').getTime())||new Date(x+'T00:00:00').toISOString().slice(0,10)!==x))return 'fecha_corte debe ser YYYY-MM-DD y corresponder al período';if(c==='seguimiento_completo'){x=norm(x);if(!['si','no'].includes(x))return 'seguimiento_completo: usa si o no'}if(!['periodo','seguimiento_completo'].includes(c)&&x.length<2)return c+' está incompleto'}r[c]=x}
 if(k==='morbilidad'){if(r.poblacion_evaluada<=0)return 'poblacion_evaluada debe ser mayor que cero';if(r.casos_existentes>r.poblacion_evaluada)return 'casos_existentes no puede exceder poblacion_evaluada';if(r.poblacion_en_riesgo!==r.poblacion_evaluada-r.casos_existentes)return 'poblacion_en_riesgo debe ser poblacion_evaluada − casos_existentes, para la misma cohorte';if(r.casos_nuevos>r.poblacion_en_riesgo)return 'casos_nuevos no puede exceder poblacion_en_riesgo'}
 if(k==='tiempo'){if(r.personas_descanso_efectivo>r.personas_elegibles)return 'personas_descanso_efectivo excede elegibles';if(r.dias_vacaciones_disfrutados>r.dias_vacaciones_programados)return 'días disfrutados exceden días programados'}
 if(k==='cobertura'&&r.completadas>r.elegibles)return 'completadas excede elegibles';
