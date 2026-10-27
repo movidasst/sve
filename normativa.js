@@ -53,6 +53,7 @@ Object.assign(DATA_TYPES, {
   sample:[['2026-09','Operaciones',7900,190,260,250,200,181,44,39,120,98,2],['2026-09','Mantenimiento',6100,230,205,190,160,139,32,26,100,61,1]]
  }
 });
+for(const k of Object.keys(DATA_TYPES))if(!Array.isArray(db[k]))db[k]=[];
 const parentValidate=validate;
 validate=function(k,input){
  let r=parentValidate(k,input);
