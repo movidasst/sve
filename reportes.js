@@ -9,6 +9,8 @@ const LEGAL=[
  ['A03','Reglamento art. 34.3','Enfermedades comunes','eventos_salud','Enfermedad común'],
  ['A04','Reglamento art. 34.4','Enfermedades ocupacionales calificadas','eventos_salud','Enfermedad ocupacional calificada'],
  ['A05','Reglamento art. 34.5','Resultados agregados de exámenes de salud','salud_complementaria',''],
+ ['A14','Reglamento Parcial art. 27 / NT-03:2016 arts. 26–30','Evaluaciones médicas por tipo, incluidas pre y posvacacionales','evaluaciones_medicas',''],
+ ['A15','NT-03:2016 arts. 29 y 30','Evaluaciones pre y posvacacionales dentro del plazo aplicable','evaluaciones_medicas',''],
  ['A06','Reglamento art. 34.6','Referencias a centros especializados','salud_complementaria',''],
  ['A07','Reglamento art. 34.7','Reposos comunes','reposos','común'],
  ['A08','Reglamento art. 34.8','Reposos vinculados al trabajo','reposos','trabajo'],
@@ -73,8 +75,8 @@ function reducePeriod(k,months,filter=()=>true){return rows(k,months).filter(fil
 function reportNumbers(c){
  const m=c.months,kind=c.type,publicVersion=kind==='mensual',out=[],missing=[];
  const add=(head,desc)=>out.push({head,desc});
- const e=reducePeriod('eventos_salud',m),work=reducePeriod('accidentes',m),repos=reducePeriod('reposos',m),health=reducePeriod('salud_complementaria',m),mor=reducePeriod('morbilidad',m),proc=reducePeriod('procesos',m),meas=reducePeriod('mediciones',m),ctrl=reducePeriod('controles',m),vac=reducePeriod('tiempo',m),shift=reducePeriod('jornada_detalle',m),cover=reducePeriod('cobertura',m);
- const has=e.length+work.length+repos.length+health.length+mor.length+proc.length+meas.length+ctrl.length+vac.length+shift.length+cover.length;
+ const e=reducePeriod('eventos_salud',m),work=reducePeriod('accidentes',m),repos=reducePeriod('reposos',m),health=reducePeriod('salud_complementaria',m),exams=reducePeriod('evaluaciones_medicas',m),mor=reducePeriod('morbilidad',m),proc=reducePeriod('procesos',m),meas=reducePeriod('mediciones',m),ctrl=reducePeriod('controles',m),vac=reducePeriod('tiempo',m),shift=reducePeriod('jornada_detalle',m),cover=reducePeriod('cobertura',m);
+ const has=e.length+work.length+repos.length+health.length+exams.length+mor.length+proc.length+meas.length+ctrl.length+vac.length+shift.length+cover.length;
  if(!has)missing.push('No se cargaron registros agregados correspondientes al período seleccionado.');
  if(kind==='mensual'||kind==='trimestral_salud'||kind==='interno'){
   if(e.length){
@@ -88,8 +90,24 @@ function reportNumbers(c){
   if(repos.length){const by={};for(const r of repos){let v0=by[r.origen]||[0,0];v0[0]+=r.episodios;v0[1]+=r.dias_reposo;by[r.origen]=v0}
    add('Reposos por origen',Object.entries(by).map(([key,a])=>key+': '+safeCount(a[0],publicVersion)+' episodios y '+(publicVersion&&a[0]>0&&a[0]<5?'días reservados':v(a[1])+' días')).join(' · ')+'.');}
   else missing.push('Sin información agregada de reposos comunes y laborales.');
-  if(health.length)add('Exámenes, referencias y discapacidad','Exámenes realizados: '+v(S(health,'examenes_realizados'))+'; resultados que requieren seguimiento: '+safeCount(S(health,'resultados_con_seguimiento'),publicVersion)+'; referencias especializadas: '+safeCount(S(health,'referencias_especializadas'),publicVersion)+'; personas con discapacidad (por cortes mensuales, no personas únicas trimestrales): '+(m.length===1?safeCount(S(health,'personas_con_discapacidad'),publicVersion):'ver por mes')+'.');
+  if(health.length)add('Registro general de exámenes, referencias y discapacidad (puede coincidir con registros por tipo; no sumar ambos)','Exámenes realizados: '+v(S(health,'examenes_realizados'))+'; resultados que requieren seguimiento: '+safeCount(S(health,'resultados_con_seguimiento'),publicVersion)+'; referencias especializadas: '+safeCount(S(health,'referencias_especializadas'),publicVersion)+'; personas con discapacidad (por cortes mensuales, no personas únicas trimestrales): '+(m.length===1?safeCount(S(health,'personas_con_discapacidad'),publicVersion):'ver por mes')+'.');
   else missing.push('Sin registros de exámenes, referencias y discapacidad.');
+  if(exams.length){
+    const groups=[...new Set(exams.map(x=>x.tipo_evaluacion))];
+    const pieces=[];
+    for(const type of groups){
+      const selected=exams.filter(x=>x.tipo_evaluacion===type);
+      const planned=S(selected,'programadas'),done=S(selected,'realizadas');
+      const timely=S(selected,'realizadas_en_plazo'),follow=S(selected,'con_seguimiento');
+      const privateSmall=publicVersion&&((done>0&&done<5)||(follow>0&&follow<5)||(planned>0&&planned<5));
+      if(privateSmall){
+        pieces.push(type+': datos reservados en divulgación por grupo pequeño.');
+      }else{
+        pieces.push(type+': '+v(done)+' realizadas / '+v(planned)+' programadas; pendientes: '+v(Math.max(0,planned-done))+'; cobertura: '+fpc(done,planned)+'; oportunas: '+v(timely)+'/'+v(done)+' ('+fpc(timely,done)+'); con seguimiento: '+v(follow)+'.');
+      }
+    }
+    add('Evaluaciones médicas ocupacionales desglosadas por tipo',pieces.join(' ')+ ' Son conteos de evaluaciones, no de personas únicas. El control de plazo se basa en los datos declarados y requiere respaldo externo.');
+  }else missing.push('Sin desglose de evaluaciones de ingreso, prevacacionales, posvacacionales, egreso y periódicas.');
   if(mor.length){
    const conditions=[...new Set(mor.map(r=>r.condicion))];
    const groups=[];for(const condition of conditions){for(const month of m){const subset=mor.filter(x=>x.condicion===condition&&x.periodo===month);if(!subset.length)continue;const dates=[...new Set(subset.map(x=>x.fecha_corte))];if(dates.length>1){groups.push(condition+' '+month+': fechas de corte distintas; no se agrega la prevalencia.');continue}const exist=S(subset,'casos_existentes'),pop=S(subset,'poblacion_evaluada');groups.push(condition+' ('+month+', corte '+dates[0]+'): '+safeCount(exist,publicVersion)+' casos presentes / '+v(pop)+' evaluados = '+(publicVersion&&exist>0&&exist<5?'Reservado':fpc(exist,pop))+'.')}}
@@ -121,8 +139,8 @@ function reportNumbers(c){
    add('Medidas preventivas y seguimiento','Acciones registradas: '+total+'; declaradas verificadas: '+verified+'; con evidencia y resultado consignados: '+substantiated+'. Una medida ejecutada no equivale por sí sola a control eficaz.');
  }else missing.push('No se documentaron acciones preventivas correspondientes al ciclo de vigilancia.');
  return {out,missing,sourceKeys:{
-   mensual:['eventos_salud','accidentes','reposos','salud_complementaria','morbilidad'],
-   trimestral_salud:['eventos_salud','accidentes','reposos','salud_complementaria','morbilidad','procesos','mediciones','controles'],
+   mensual:['eventos_salud','accidentes','reposos','salud_complementaria','evaluaciones_medicas','morbilidad'],
+   trimestral_salud:['eventos_salud','accidentes','reposos','salud_complementaria','evaluaciones_medicas','morbilidad','procesos','mediciones','controles'],
    trimestral_tiempo:['jornada_detalle','tiempo'],
    interno:Object.keys(DATA_TYPES)
  }[kind],activeMonths:m,actionSubset};
