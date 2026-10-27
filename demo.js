@@ -142,6 +142,7 @@ function updateDisplay(){
  if(banner){banner.hidden=!active;banner.classList.toggle('active',active)}
  if(box)box.classList.toggle('demo-active',active);
  if(go)go.textContent=active?'↻ Reiniciar demostración completa':'▶ Cargar trimestre demo completo';
+ const homeLoad=document.getElementById('loadCompleteDemo');if(homeLoad)homeLoad.textContent=active?'↻ Reiniciar demostración completa':'▶ Cargar demostración completa';
  if(load)load.textContent=active?'↻ Reiniciar demo del trimestre':'▶ Cargar trimestre demo completo';
  for(const b of [exit,exit2])if(b)b.hidden=!active;
  const title=document.getElementById('demoModeTitle');
