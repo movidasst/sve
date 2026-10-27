@@ -108,7 +108,7 @@
   #printSheet table th, #printSheet table td,
   #printSheet .rpt-tbl th, #printSheet .rpt-tbl td {
     min-width: 0 !important;
-    max-width: 0 !important;
+    max-width: 100% !important;
     padding: 4pt !important;
     font-size: 7.6pt !important;
     line-height: 1.32 !important;
