@@ -47,6 +47,26 @@ Se presentan 21 puntos de revisión con base normativa. La aplicación distingue
 
 La matriz **no asigna una calificación automática de cumplimiento**. La historia de salud debe permanecer en custodia profesional fuera de esta web. Las acciones solo pueden marcarse **«Verificada»** después de introducir referencia de evidencia y resultado de la comprobación.
 
+## Demostración trimestral integral (datos ficticios)
+
+En **Inicio**, pulsa **«Cargar demostración completa»** para abrir el período **julio–septiembre 2026** de *Industrias Horizonte*, una empresa enteramente ficticia.
+
+El sistema genera **243 registros en los 12 componentes** de vigilancia, incluidas seis clases de evaluaciones médicas, tres áreas de trabajo, dos condiciones de morbilidad, eventos de salud, accidentes, mediciones, controles preventivos, jornadas, cinco acciones y 23 puntos de revisión documental (21 con referencias **simuladas** y dos trámites oficiales indicados como pendientes).
+
+En **Informes** encontrarás accesos directos a cuatro documentos:
+- informe mensual de salud (el mes de septiembre de 2026),
+- soporte trimestral de accidentes y enfermedades,
+- soporte trimestral de utilización del tiempo libre,
+- informe integral interno.
+
+Cada documento puede generarse e imprimirse como PDF; Word y Excel están disponibles desde los controles existentes. **Los datos, nombres de empresa, hallazgos y documentos de evidencia son completamente ficticios**. No use los informes de demostración como constancias legales, diagnósticos o reportes reales.
+
+### Borrar demostración y empezar con datos propios
+
+Cuando termines, selecciona **«Borrar demo y comenzar con mis datos»** en Inicio, Informes o en el aviso superior. Esta acción elimina exclusivamente el conjunto ficticio y **restaura los registros, acciones, evidencias y configuración que existían antes de cargarlo**, siempre que el almacenamiento local del navegador siga disponible. Si la aplicación estaba vacía, volverá a estar vacía.
+
+La demostración nunca se mezcla silenciosamente con importaciones reales: para cargar archivos propios primero debes salir de ella. Antes de usar información productiva, exporta además un respaldo Excel/CSV de seguridad. Las modificaciones efectuadas durante una demostración se pierden al borrarla.
+
 ## Instrucciones de uso
 1. En la pestaña Datos selecciona componente y descarga la plantilla Excel o CSV.
 2. No modifiques los nombres de columnas; usa **YYYY-MM** para período. La morbilidad también requiere **fecha_corte YYYY-MM-DD**, correspondiente al inicio del período de seguimiento.
