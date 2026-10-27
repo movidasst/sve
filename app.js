@@ -167,7 +167,7 @@ function ready(){
  load();updateDatasetSelect();$('#datasetSelect').addEventListener('change',e=>{dataset=e.target.value;$('#importResult').innerHTML='';$('#manualForm').classList.add('hidden');$('#toggleManual').textContent='Mostrar formulario';renderData()});
  $$('.nav-item').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
  $$('[data-tab]:not(.nav-item)').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
- $('#goLoad').addEventListener('click',()=>go('datos'));$('#goDemo').addEventListener('click',demo);$('#loadDemoReports').addEventListener('click',demo);
+ $('#goLoad').addEventListener('click',()=>go('datos'));$('#goExamsData').addEventListener('click',()=>{dataset='evaluaciones_medicas';go('datos')});$('#goDemo').addEventListener('click',demo);$('#loadDemoReports').addEventListener('click',demo);
  $('#helpTop').addEventListener('click',()=>$('#helpDialog').showModal());$('#installApp').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();try{await installPrompt.userChoice}catch(e){}installPrompt=null}else{alert('Para instalar SVE:\n\nAndroid (Chrome): abre el menú ⋮ y selecciona Instalar aplicación / Agregar a pantalla principal.\n\niPhone (Safari): toca Compartir → Añadir a pantalla de inicio.')}});
  $('#templateXLSX').addEventListener('click',()=>exportTemplate(dataset,true));$('#templateCSV').addEventListener('click',()=>exportTemplate(dataset,false));$('#sampleCSV').addEventListener('click',()=>dl('\ufeff'+makeCSV([DATA_TYPES[dataset].columns,...DATA_TYPES[dataset].sample]),'SVE_Ejemplo_'+dataset+'.csv','text/csv;charset=utf-8'));
  $('#uploadFile').addEventListener('change',e=>importFile(e.target.files[0]));
