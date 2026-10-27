@@ -130,7 +130,7 @@ function reportNumbers(c){
 function matrixHtml(c,edit){
  const head='<div class="matrix-intro"><strong>Comprobación de fuentes y evidencias</strong><small>«Datos cargados» solo confirma un registro agregado, no la suficiencia legal, exactitud clínica o la presentación oficial.</small></div>';
  return head+'<div class="matrix-items">'+LEGAL.map(req=>{
- const status=present(req,c.months),ev=evidence[req[0]]||{},pending=ev.status||'Pendiente',available=ev.status==='Disponible';
+ const status=present(req,c.months),ev=evidence[req[0]]||{},pending=ev.status||'Pendiente',available=ev.status==='Disponible'&&!!String(ev.reference||'').trim();
  return '<article class="matrix-item"><div class="matrix-main"><strong>'+h(req[0])+' · '+h(req[2])+'</strong><span>'+h(req[1])+'</span><div class="matrix-tags"><span class="data-status '+(status?'has-data':'no-data')+'">'+(status?'Datos cargados':'Datos no acreditados en la app')+'</span><span class="data-status '+(available?'has-data':'no-data')+'">Evidencia: '+h(pending)+'</span></div></div>'+(edit?'<div class="matrix-entry"><select aria-label="Estado de evidencia" data-evidence-status="'+h(req[0])+'"><option value="Pendiente"'+(pending==='Pendiente'?' selected':'')+'>Pendiente de validar</option><option value="Disponible"'+(pending==='Disponible'?' selected':'')+'>Disponible y revisada</option><option value="No aplica"'+(pending==='No aplica'?' selected':'')+'>No aplica (justificar)</option></select><input aria-label="Referencia documental" data-evidence-reference="'+h(req[0])+'" maxlength="160" value="'+h(ev.reference||'')+'" placeholder="Código / ubicación documental (sin nombres)"></div>':'<small>'+h(ev.reference||'Sin referencia documental')+'</small>')+'</article>';
  }).join('')+'</div>';
 }
