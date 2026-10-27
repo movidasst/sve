@@ -101,12 +101,18 @@
   <div id="indicatorGrid" class="metric-grid"></div>
   <div class="card"><div class="card-head"><div><h2>Evaluaciones médicas ocupacionales</h2><p class="muted">Ingreso, prevacacional, posvacacional, egreso y exámenes periódicos por programa o exposición. Seguimiento por tipo y período.</p></div><button class="btn quiet mini" type="button" id="goExamsData">Cargar datos</button></div>
   <div id="examsIndicators"></div></div>
+  <div class="card"><div class="card-head"><div><h2>Condiciones psicosociales y organización del trabajo</h2><p class="muted">Módulo 3 · Vigilancia colectiva de carga, turnos, autonomía y apoyo. Estas señales son hallazgos para investigar, no diagnósticos individuales.</p></div></div>
+    <div id="psychosocialIndicators"></div>
+    <p class="fine-print">Los porcentajes se interpretan por área, factor, método y período. La cobertura de evaluación y la verificación de medidas no prueban por sí solas eficacia ni causalidad. Las celdas pequeñas se reservan.</p>
+  </div>
   <div class="card">
     <div class="card-head"><div><h2>Comparación entre áreas</h2><p class="muted">Prevalencia puntual de la condición seleccionada, en el mismo período.</p></div></div>
     <div id="areaChart" class="bar-chart"></div>
     <div id="chartNote" class="fine-print"></div>
   </div>
-  <div class="card interpretation-card"><h2>Lectura preventiva de los resultados</h2><div id="interpretations"></div></div>
+  <div class="card interpretation-card"><h2>Lectura preventiva de los resultados</h2><div id="interpretations"></div>
+    <div class="rpt-disclaimer"><strong>Correlación ≠ causalidad.</strong> Si coinciden dos variables (por ejemplo, horas extra y reportes de fatiga), documenta el período, las fuentes, factores alternativos y la evidencia pendiente. No atribuyas un diagnóstico ni una causa individual por una asociación descriptiva. Si el peligro requiere atención, adopta controles preventivos aunque la investigación continúe.</div>
+  </div>
   <div class="notice notice-warn"><strong>Regla epidemiológica:</strong> prevalencia = casos presentes / población evaluada en una fecha; incidencia acumulada = casos nuevos / población inicialmente libre de la condición, para el período y cohorte definidos. Si el seguimiento no fue completo, la aplicación no presenta el cociente simple como estimación válida.</div>
 </section>
 
@@ -153,6 +159,7 @@
       <div class="field"><label for="formalResponsible">Unidad responsable (sin nombre personal)</label><input id="formalResponsible" maxlength="95" value="Servicio de Seguridad y Salud en el Trabajo"></div>
       <div class="field"><label for="formalParticipation">Participación y revisión</label><select id="formalParticipation"><option value="sin">Pendiente de documentar</option><option value="con">Acta o evidencia institucional disponible</option><option value="revision">En proceso de revisión por instancias competentes</option></select></div>
       <div class="field span-2"><label for="formalMethod">Método y criterios de vigilancia</label><textarea id="formalMethod" maxlength="700" placeholder="Definición de eventos, fuentes, calidad de registros, población, periodicidad. No registrar información clínica individual."></textarea></div>
+      <div class="field span-2"><label for="formalHypothesis">Hipótesis epidemiológica y límites de interpretación (sin datos personales)</label><textarea id="formalHypothesis" maxlength="1100" placeholder="Se observa una asociación descriptiva entre… Fuentes que deben verificarse… Otros factores posibles… La causalidad no está demostrada."></textarea><p class="fine-print">Describe qué se observó, lo que los datos NO prueban, explicaciones alternativas y qué información falta. No confundas sospecha, diagnóstico y enfermedad ocupacional calificada.</p></div>
       <div class="field span-2"><label for="formalDecision">Análisis profesional y recomendaciones</label><textarea id="formalDecision" maxlength="1100" placeholder="Describa hallazgos y decisiones sustentadas en datos. No atribuya causalidad sin investigación."></textarea></div>
     </div>
     <div class="button-line formal-buttons">
