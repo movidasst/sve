@@ -61,7 +61,7 @@ function parameters(){
  month=el('formalPeriod').value||latestPeriod()||'2026-10',
  year=String(el('formalYear').value||month.slice(0,4)),
  quarter=el('formalQuarter').value;
- return {type,months:monthsOf(type,month,year,quarter),month,year,quarter,org:el('formalOrg').value.trim(),responsible:el('formalResponsible').value.trim(),method:el('formalMethod').value.trim(),decision:el('formalDecision').value.trim(),participation:el('formalParticipation').value};
+ return {type,months:monthsOf(type,month,year,quarter),month,year,quarter,org:el('formalOrg').value.trim(),responsible:el('formalResponsible').value.trim(),method:el('formalMethod').value.trim(),decision:el('formalDecision').value.trim(),hypothesis:el('formalHypothesis').value.trim(),participation:el('formalParticipation').value};
 }
 const reportType={
  mensual:{title:'Informe mensual de vigilancia de la salud · divulgación colectiva',base:'NT-04:2023, vigilancia de salud y divulgación mensual',scope:'Divulgación agregada: no se muestran diagnósticos individuales ni grupos pequeños.'},
@@ -76,8 +76,8 @@ function reducePeriod(k,months,filter=()=>true){return rows(k,months).filter(fil
 function reportNumbers(c){
  const m=c.months,kind=c.type,publicVersion=kind==='mensual',out=[],missing=[];
  const add=(head,desc)=>out.push({head,desc});
- const e=reducePeriod('eventos_salud',m),work=reducePeriod('accidentes',m),repos=reducePeriod('reposos',m),health=reducePeriod('salud_complementaria',m),exams=reducePeriod('evaluaciones_medicas',m),mor=reducePeriod('morbilidad',m),proc=reducePeriod('procesos',m),meas=reducePeriod('mediciones',m),ctrl=reducePeriod('controles',m),vac=reducePeriod('tiempo',m),shift=reducePeriod('jornada_detalle',m),cover=reducePeriod('cobertura',m);
- const has=e.length+work.length+repos.length+health.length+exams.length+mor.length+proc.length+meas.length+ctrl.length+vac.length+shift.length+cover.length;
+ const e=reducePeriod('eventos_salud',m),work=reducePeriod('accidentes',m),repos=reducePeriod('reposos',m),health=reducePeriod('salud_complementaria',m),exams=reducePeriod('evaluaciones_medicas',m),mor=reducePeriod('morbilidad',m),proc=reducePeriod('procesos',m),meas=reducePeriod('mediciones',m),ctrl=reducePeriod('controles',m),vac=reducePeriod('tiempo',m),shift=reducePeriod('jornada_detalle',m),cover=reducePeriod('cobertura',m),psy=reducePeriod('psicosocial',m);
+ const has=e.length+work.length+repos.length+health.length+exams.length+mor.length+proc.length+meas.length+ctrl.length+vac.length+shift.length+cover.length+psy.length;
  if(!has)missing.push('No se cargaron registros agregados correspondientes al período seleccionado.');
  if(kind==='mensual'||kind==='trimestral_salud'||kind==='interno'){
   if(e.length){
@@ -124,6 +124,21 @@ function reportNumbers(c){
   if(ctrl.length){
    add('Controles según su nivel',['Fuente','Ambiente','Trabajadores'].map(level=>{const a=ctrl.filter(r=>r.nivel===level);return level+': '+v(S(a,'implementadas'))+'/'+v(S(a,'programadas'))+' implementados, '+v(S(a,'verificadas'))+' verificados';}).join(' · ')+'.');
   }else missing.push('Sin clasificación de controles en fuente, ambiente y trabajadores.');
+  if(psy.length){
+   const grouped=[];
+   for(const month of m){
+    const currentMonth=psy.filter(r=>r.periodo===month);
+    for(const r of currentMonth){
+     const sufficientlyAggregated=r.personas_evaluadas>=5&&r.personas_elegibles>=5;
+     const coverage=sufficientlyAggregated?fpc(r.personas_evaluadas,r.personas_elegibles):'Reservado por grupo pequeño';
+     const signals=sufficientlyAggregated&&r.personas_con_senal>=5
+       ? v(r.personas_con_senal)+' señales entre '+v(r.personas_evaluadas)+' participantes ('+fpc(r.personas_con_senal,r.personas_evaluadas)+')'
+       :r.personas_con_senal===0?'sin señales declaradas':'señales reservadas por grupo pequeño';
+     grouped.push(month+' · '+r.area+' · '+r.factor+' ('+r.metodo+'): cobertura '+coverage+'; '+signals+'; medidas verificadas '+v(r.medidas_verificadas)+'/'+v(r.medidas_programadas)+'.');
+    }
+   }
+   add('Vigilancia de condiciones psicosociales y organización del trabajo',grouped.join(' ')+' Los resultados son señales de condiciones laborales, no diagnósticos de trastornos mentales ni prueba de relación causal. No sumar personas de factores diferentes: podrían repetirse.');
+  }else missing.push('Sin registros colectivos de condiciones psicosociales y organización del trabajo.');
   if(cover.length){
    const groups=[...new Set(cover.map(x=>x.actividad))];add('Cobertura de actividades',groups.map(a=>{const r=cover.filter(x=>x.actividad===a);return a+': '+(m.length===1?fpc(S(r,'completadas'),S(r,'elegibles')):'datos disponibles; revisar porcentajes mes a mes para evitar sumar personas repetidas')}).join('; ')+'.');
   }
@@ -141,7 +156,7 @@ function reportNumbers(c){
  }else missing.push('No se documentaron acciones preventivas correspondientes al ciclo de vigilancia.');
  return {out,missing,sourceKeys:{
    mensual:['eventos_salud','accidentes','reposos','salud_complementaria','evaluaciones_medicas','morbilidad'],
-   trimestral_salud:['eventos_salud','accidentes','reposos','salud_complementaria','evaluaciones_medicas','morbilidad','procesos','mediciones','controles'],
+   trimestral_salud:['eventos_salud','accidentes','reposos','salud_complementaria','evaluaciones_medicas','morbilidad','procesos','mediciones','controles','psicosocial'],
    trimestral_tiempo:['jornada_detalle','tiempo'],
    interno:Object.keys(DATA_TYPES)
  }[kind],activeMonths:m,actionSubset};
@@ -169,10 +184,11 @@ function makeReport(c){
  '<h3>2. Método y fuentes</h3><p>'+h(c.method||'Método específico pendiente de documentar por el Servicio SST. Las plantillas contienen cantidades agregadas, no constituyen resultados individuales ni diagnóstico clínico.')+'</p><p class="rpt-note">Fuentes cargadas: '+h(d.sourceKeys.filter(x=>rows(x,c.months).length).map(x=>DATA_TYPES[x].short).join(', ')||'Ninguna')+'.</p>'+
  '<h3>3. Indicadores y resultados</h3>'+ (rows2||'<p>No se dispone de datos correspondientes a este informe. No deben interpretarse cantidades ausentes como cero eventos.</p>')+
  '<h3>4. Interpretación y recomendaciones técnicas</h3><p>'+h(c.decision||'Pendiente de análisis y validación profesional. Los resultados descriptivos no acreditan relación causal.')+'</p>'+
- '<h3>5. Acciones y comprobación</h3>'+table+
- '<h3>6. Participación y documentación</h3><p>Participación institucional: '+h(c.participation==='con'?'Se declara disponible acta o evidencia':c.participation==='revision'?'Revisión en proceso':'Pendiente de documentar')+'. '+h(evidenceNarrative)+'</p>'+
- '<h3>7. Datos o evidencias pendientes</h3>'+(miss?'<ul>'+miss+'</ul>':'<p>No se identificaron faltantes de carga para los componentes revisados; comprobar registros, soportes y suficiencia de datos antes de circular el informe.</p>')+
- (publicVersion?'<h3>8. Resguardo documental</h3><p>La matriz de evidencias y los documentos internos no se incluyen en la versión de divulgación.</p>':'<h3>8. Matriz de correspondencia normativa</h3>'+matrixHtml(c,false))+
+ '<h3>5. Hipótesis y límites de interpretación</h3><p>'+h(c.hypothesis||'No se ha documentado una hipótesis específica. Las asociaciones descriptivas no demuestran causalidad. Investigar temporalidad, exposición, fuentes, factores alternativos y métodos antes de atribuir un origen.')+'</p>'+ 
+ '<h3>6. Acciones y comprobación</h3>'+table+
+ '<h3>7. Participación y documentación</h3><p>Participación institucional: '+h(c.participation==='con'?'Se declara disponible acta o evidencia':c.participation==='revision'?'Revisión en proceso':'Pendiente de documentar')+'. '+h(evidenceNarrative)+'</p>'+
+ '<h3>8. Datos o evidencias pendientes</h3>'+(miss?'<ul>'+miss+'</ul>':'<p>No se identificaron faltantes de carga para los componentes revisados; comprobar registros, soportes y suficiencia de datos antes de circular el informe.</p>')+
+ (publicVersion?'<h3>9. Resguardo documental</h3><p>La matriz de evidencias y los documentos internos no se incluyen en la versión de divulgación.</p>':'<h3>9. Matriz de correspondencia normativa</h3>'+matrixHtml(c,false))+
  '<p class="rpt-limit"><b>Confidencialidad:</b> no publicar información desagregada que permita identificar personas. Para grupos pequeños se reservan valores en el informe mensual de divulgación. Los registros agregados no sustituyen historias médicas individuales ni los formularios y trámites ante INPSASEL.</p>'+
  '<div class="rpt-signatures"><div>Revisado por Servicio SST / firma externa</div><div>Participación de representantes / constancia externa</div></div>'+
  '<footer>Elaborado por David Linares Brea · Academia Movida de SST · www.movidasst.com · Documento técnico generado localmente</footer></article>';
@@ -189,7 +205,7 @@ function csvEscape(s){return String(s??'').replace(/[\r\n]/g,' ').replaceAll(';'
 function getSheets(){
  const c=(current||{...parameters()}),d=reportNumbers(c);
  const sheets=[];
- sheets.push({name:'Informe',data:[['Campo','Valor'],['Documento',reportType[c.type].title],['Empresa',c.org],['Meses',c.months.join(', ')],['Unidad responsable',c.responsible],['Método',c.method],['Interpretación',c.decision],['Precisión','Documento técnico no oficial'],...d.out.map(x=>[x.head,x.desc])]});
+ sheets.push({name:'Informe',data:[['Campo','Valor'],['Documento',reportType[c.type].title],['Empresa',c.org],['Meses',c.months.join(', ')],['Unidad responsable',c.responsible],['Método',c.method],['Hipótesis y límites',c.hypothesis],['Interpretación',c.decision],['Precisión','Documento técnico no oficial'],...d.out.map(x=>[x.head,x.desc])]});
  if(c.type!=='mensual')sheets.push({name:'Matriz normativa',data:[['Código','Base normativa','Tema','Datos cargados','Estado de evidencia','Referencia'],...LEGAL.map(q=>[q[0],q[1],q[2],present(q,c.months)?'Sí':'No',(evidence[q[0]]||{}).status||'Pendiente',(evidence[q[0]]||{}).reference||''])]});
  if(c.type!=='mensual')sheets.push({name:'Acciones',data:[['Hallazgo','Medida','Responsable','Fecha','Estado','Evidencia de verificación','Resultado'],...d.actionSubset.map(x=>[x.finding,x.measure,x.owner,x.due,x.status,x.verificationEvidence||'',x.verificationResult||''])]});
  if(c.type!=='mensual')for(const k of d.sourceKeys){const def=DATA_TYPES[k],r=rows(k,c.months);sheets.push({name:k.slice(0,31),data:[def.columns,...r.map(a=>def.columns.map(key=>a[key]))]})}
@@ -218,7 +234,7 @@ function exportPDF(){
  let print=el('printSheet');print.innerHTML=current.html;document.body.classList.add('printing-sve');window.print();
 }
 function persistEvidence(){try{localStorage.setItem(EVIDENCE_KEY,JSON.stringify(evidence))}catch(e){notify('No se pudo guardar la matriz; exporta un respaldo.')}}
-function saveConfig(){try{const values={};for(const id of ['formalType','formalPeriod','formalQuarter','formalYear','formalOrg','formalResponsible','formalParticipation','formalMethod','formalDecision'])values[id]=el(id).value;localStorage.setItem(CONFIG_KEY,JSON.stringify(values))}catch(e){}}
+function saveConfig(){try{const values={};for(const id of ['formalType','formalPeriod','formalQuarter','formalYear','formalOrg','formalResponsible','formalParticipation','formalMethod','formalHypothesis','formalDecision'])values[id]=el(id).value;localStorage.setItem(CONFIG_KEY,JSON.stringify(values))}catch(e){}}
 function hydrate(){try{let raw=JSON.parse(localStorage.getItem(EVIDENCE_KEY)||'{}');if(raw&&typeof raw==='object')evidence=raw}catch(e){}
  try{let raw=JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}');for(const [id,value] of Object.entries(raw||{})){if(el(id))el(id).value=value}}catch(e){}
  if(!el('formalPeriod').value)el('formalPeriod').value=latestPeriod()||new Date().toISOString().slice(0,7);
@@ -236,7 +252,7 @@ function init(){
  el('formalPDFBottom').addEventListener('click',exportPDF);
  el('formalWordBottom').addEventListener('click',exportWord);
  el('formalExcelBottom').addEventListener('click',exportExcel);
- for(const id of ['formalType','formalPeriod','formalQuarter','formalYear','formalOrg','formalResponsible','formalParticipation','formalMethod','formalDecision']){
+ for(const id of ['formalType','formalPeriod','formalQuarter','formalYear','formalOrg','formalResponsible','formalParticipation','formalMethod','formalHypothesis','formalDecision']){
   el(id).addEventListener('change',()=>{saveConfig();refresh()});
  }
  el('normMatrix').addEventListener('change',e=>{
@@ -263,5 +279,6 @@ function init(){
  el('formalPeriod').addEventListener('change',()=>{const m=el('formalPeriod').value;if(m){el('formalYear').value=m.slice(0,4);el('formalQuarter').value=String(Math.floor((Number(m.slice(5))-1)/3)+1)}});
  refresh();
 }
+window.addEventListener('afterprint',()=>document.body.classList.remove('printing-sve'));
 document.addEventListener('DOMContentLoaded',init);
 })();
