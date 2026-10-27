@@ -129,7 +129,7 @@ function clearDemo(){
  if(!confirm('Se borrará la demostración (datos ficticios, acciones y evidencias). Si existían datos reales antes de entrar, se restaurarán en este navegador.\n\n¿Salir de la DEMO y empezar con tus datos?'))return false;
  try{
   const stored=localStorage.getItem(BACKUP_KEY);
-  if(stored){const state=JSON.parse(stored);put(APP_KEY,state.app);put(EVIDENCE_KEY,state.evidence);put(CONFIG_KEY,state.config)}
+  if(stored){const state=JSON.parse(stored);put(APP_KEY,state.app);put(EVIDENCE_KEY,state.evidence);put(CONFIG_KEY,state.config);try{sessionStorage.setItem('movidasst_sve_restore_report_org',state.reportOrg||'')}catch(e){}}
   else{localStorage.removeItem(APP_KEY);localStorage.removeItem(EVIDENCE_KEY);localStorage.removeItem(CONFIG_KEY)}
   localStorage.removeItem(BACKUP_KEY);
  }catch(e){alert('No se pudo recuperar el estado anterior. Exporta un respaldo y revisa el almacenamiento del navegador.');return false}
@@ -171,10 +171,11 @@ function openReport(type){
 }
 function attach(){
  updateDisplay();
+ if(!demoActive()){try{const saved=sessionStorage.getItem('movidasst_sve_restore_report_org');if(saved!==null){const field=document.getElementById('reportOrganization');if(field)field.value=saved;sessionStorage.removeItem('movidasst_sve_restore_report_org')}}catch(e){}}
  for(const id of ['exitCompleteDemo','exitDemoReports','clearDemoTop']){const b=document.getElementById(id);if(b)b.addEventListener('click',clearDemo)}
  const loadButton=document.getElementById('loadCompleteDemo');if(loadButton)loadButton.addEventListener('click',loadDemo);
- const reportBtn=document.getElementById('goDemoReports');if(reportBtn)reportBtn.addEventListener('click',()=>{if(!demoActive()){try{sessionStorage.setItem('movidasst_demo_report_pending','trimestral_salud')}catch(e){}loadDemo();return}openReport('trimestral_salud')});
- document.querySelectorAll('[data-demo-report]').forEach(b=>b.addEventListener('click',()=>{const type=b.dataset.demoReport||'trimestral_salud';if(!demoActive()){try{sessionStorage.setItem('movidasst_demo_report_pending',type)}catch(e){}loadDemo();return}openReport(type)}));
+ const reportBtn=document.getElementById('goDemoReports');if(reportBtn)reportBtn.addEventListener('click',()=>{if(!demoActive()){try{sessionStorage.setItem('movidasst_demo_report_pending','trimestral_salud')}catch(e){}if(!loadDemo())try{sessionStorage.removeItem('movidasst_demo_report_pending')}catch(e){}return}openReport('trimestral_salud')});
+ document.querySelectorAll('[data-demo-report]').forEach(b=>b.addEventListener('click',()=>{const type=b.dataset.demoReport||'trimestral_salud';if(!demoActive()){try{sessionStorage.setItem('movidasst_demo_report_pending',type)}catch(e){}if(!loadDemo())try{sessionStorage.removeItem('movidasst_demo_report_pending')}catch(e){}return}openReport(type)}));
  try{const pending=sessionStorage.getItem('movidasst_demo_report_pending');if(pending&&demoActive()){sessionStorage.removeItem('movidasst_demo_report_pending');openReport(pending)}}catch(e){}
  const clearAll=document.getElementById('clearAll');
  if(clearAll)clearAll.addEventListener('click',function(event){if(demoActive()){event.preventDefault();event.stopImmediatePropagation();clearDemo()}},true);
