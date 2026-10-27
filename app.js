@@ -70,6 +70,7 @@ function updateDatasetSelect(){
  const groups=[
  ['Vigilancia de salud y exámenes',['evaluaciones_medicas','morbilidad','eventos_salud','reposos','salud_complementaria','accidentes']],
  ['Procesos peligrosos',['procesos','mediciones','controles']],
+ ['Condiciones psicosociales',['psicosocial']],
  ['Tiempo libre',['tiempo','jornada_detalle']],
  ['Implementación y cobertura',['cobertura']]
  ];
@@ -174,6 +175,8 @@ function renderActions(){const sorted=[...actions].sort((a,b)=>a.due.localeCompa
 function reportHTML(){const x=collectMetrics(),name=$('#reportOrganization').value.trim(),period=filter.period||'Sin período',label=isDemo?'EJEMPLO DIDÁCTICO — DATOS FICTICIOS':'INFORME CON DATOS AGREGADOS',mNotes=[];
 if(x.m.length)mNotes.push('Morbilidad ('+filter.condition+'): '+sum(x.m,'casos_existentes')+' casos existentes / '+sum(x.m,'poblacion_evaluada')+' evaluados = '+valPct(x.pre)+'. Casos nuevos: '+sum(x.m,'casos_nuevos')+'. Incidencia acumulada: '+valPct(x.inc)+(x.inc===null?' (no estimable con el seguimiento informado)':' en '+period)+'. Consultas: '+sum(x.m,'consultas')+' (no equivalen a personas).');
 if(x.a.length)mNotes.push('Accidentes: '+sum(x.a,'accidentes')+' eventos de trabajo; '+sum(x.a,'incidentes')+' incidentes. Frecuencia operativa por millón de horas trabajadas: '+(x.rate===null?'sin denominador válido':fmt(x.rate,1))+'.');
+const psys=rowsFor('psicosocial');
+if(psys.length)mNotes.push('Condiciones psicosociales: '+psys.length+' registros por área/factor/método en '+period+'. Evaluaciones, señales y medidas deben interpretarse por separado; no sumar personas entre factores ni inferir diagnósticos o causalidad.');
 if(x.p.length)mNotes.push('Procesos peligrosos: '+sum(x.p,'hallazgos')+' hallazgos en '+sum(x.p,'inspecciones')+' inspecciones; verificación de controles '+valPct(x.ver)+'.');
 if(x.t.length)mNotes.push('Tiempo libre: descanso efectivo '+valPct(x.desc)+'; disfrute de días de vacaciones programados '+valPct(x.vac)+'. Horas extra acumuladas: '+sum(x.t,'horas_extra')+'.');
 if(x.c.length)mNotes.push('Implementación: cobertura de actividades '+valPct(x.co)+'.');
