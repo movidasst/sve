@@ -139,7 +139,7 @@ function makeReport(c){
  const rows2=d.out.map(x=>'<section class="rpt-section"><h3>'+h(x.head)+'</h3><p>'+h(x.desc)+'</p></section>').join('');
  const miss=d.missing.map(x=>'<li>'+h(x)+'</li>').join('');
  const activeEvidence=LEGAL.filter(req=>present(req,c.months)).length;
- const reviewed=LEGAL.filter(req=>(evidence[req[0]]||{}).status==='Disponible').length;
+ const reviewed=LEGAL.filter(req=>{const x=evidence[req[0]]||{};return x.status==='Disponible'&&!!String(x.reference||'').trim()}).length;
  const evidenceNarrative='La matriz identifica '+activeEvidence+' campos con registros agregados y '+reviewed+' requisitos con evidencia declarada disponible/revisada, sobre '+LEGAL.length+' puntos de revisión. Esto no constituye una calificación legal de cumplimiento.';
  const table='<table class="rpt-tbl"><thead><tr><th>Medida / hallazgo</th><th>Responsable por función</th><th>Verificación</th><th>Conclusión</th></tr></thead><tbody>'+(d.actionSubset.length?d.actionSubset.map(a=>'<tr><td><strong>'+h(a.finding)+'</strong><br>'+h(a.measure)+'</td><td>'+h(a.owner)+'</td><td>'+h(a.due)+'<br>'+h(a.status)+'</td><td>'+h(a.verificationResult||'Sin resultado documentado')+'</td></tr>').join(''):'<tr><td colspan="4">Sin medidas documentadas.</td></tr>')+'</tbody></table>';
  const demoMode=(typeof isDemo!=='undefined')&&!!isDemo;
@@ -177,7 +177,7 @@ function getSheets(){
  return sheets;
 }
 function exportExcel(){
- if(!current)presentReport();
+ presentReport();
  if(!current)return;
  const sheets=getSheets();
  if(window.XLSX){
@@ -188,14 +188,14 @@ function exportExcel(){
  }else{for(const sh of sheets)dl('\ufeff'+makeCSV(sh.data),'SVE_'+sh.name+'.csv','text/csv;charset=utf-8');notify('Excel no disponible. Se descargaron hojas CSV.')}
 }
 function exportWord(){
- if(!current)presentReport();if(!current)return;
+ presentReport();if(!current)return;
  const styles='body{font:11pt Arial,sans-serif;color:#142c3b}h2,h3{color:#00205b}h2{font-size:21pt}h3{font-size:13pt;padding-top:10pt;border-top:1px solid #dde5e9}.sve-document{padding:8px}.rpt-kicker{font-size:9pt;color:#007b85;font-weight:bold}.rpt-tbl{border-collapse:collapse;width:100%}.rpt-tbl th,.rpt-tbl td{border:1px solid #cad7df;padding:6px;font-size:9pt}.matrix-item{border-bottom:1px solid #ddd;padding:6px 0}.matrix-main span,.matrix-tags{display:block;font-size:9pt}.rpt-signatures{margin-top:24pt;display:table;width:100%}.rpt-signatures div{display:table-cell;border-top:1px solid #333;padding:8pt}.rpt-limit,.rpt-note{font-size:9pt}.rpt-disclaimer{background:#eef6f4;padding:10pt}.rpt-meta{margin:12pt 0}footer{margin-top:20pt;font-size:9pt}';
  const doc='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Informe SVE</title><style>'+styles+'</style></head><body>'+current.html+'</body></html>';
  dl('\ufeff'+doc,'SVE_Informe_'+current.type+'_'+current.months.join('_')+'.doc','application/msword;charset=utf-8');
  notify('Documento Word editable (.doc) descargado.');
 }
 function exportPDF(){
- if(!current)presentReport();if(!current)return;
+ presentReport();if(!current)return;
  let print=el('printSheet');print.innerHTML=current.html;document.body.classList.add('printing-sve');window.print();
 }
 function persistEvidence(){try{localStorage.setItem(EVIDENCE_KEY,JSON.stringify(evidence))}catch(e){notify('No se pudo guardar la matriz; exporta un respaldo.')}}
