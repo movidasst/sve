@@ -52,6 +52,7 @@ function present(r,months){
  if(r[0]==='A08')return entry.some(x=>/trabajo|ocupacional/i.test(x.origen));
  if(r[0]==='T03')return entry.some(x=>Number(x.actividades_recreativas_realizadas)>0);
  if(r[0]==='A11')return ['Fuente','Ambiente','Trabajadores'].every(n=>entry.some(x=>x.nivel===n));
+ if(r[0]==='A15')return entry.some(x=>x.tipo_evaluacion==='Prevacacional'||x.tipo_evaluacion==='Posvacacional');
  if(r[4])return entry.some(x=>x.categoria===r[4]);
  return entry.length>0;
 }
@@ -106,7 +107,7 @@ function reportNumbers(c){
         pieces.push(type+': '+v(done)+' realizadas / '+v(planned)+' programadas; pendientes: '+v(Math.max(0,planned-done))+'; cobertura: '+fpc(done,planned)+'; oportunas: '+v(timely)+'/'+v(done)+' ('+fpc(timely,done)+'); con seguimiento: '+v(follow)+'.');
       }
     }
-    add('Evaluaciones médicas ocupacionales desglosadas por tipo',pieces.join(' ')+ ' Son conteos de evaluaciones, no de personas únicas. El control de plazo se basa en los datos declarados y requiere respaldo externo.');
+    add('Evaluaciones médicas ocupacionales por tipo · Reglamento art. 27 / NT-03:2016 arts. 26–30',pieces.join(' ')+ ' Son conteos de evaluaciones, no de personas únicas. El control de plazo se basa en los datos declarados y requiere respaldo externo.');
   }else missing.push('Sin desglose de evaluaciones de ingreso, prevacacionales, posvacacionales, egreso y periódicas.');
   if(mor.length){
    const conditions=[...new Set(mor.map(r=>r.condicion))];
