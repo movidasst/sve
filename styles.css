@@ -161,3 +161,94 @@
   #printSheet img { max-width: 100% !important; height: auto !important; }
   #printSheet footer { overflow-wrap: anywhere !important; }
 }
+
+
+/* UX guiada y PDF narrativo SVE — v7 */
+.context-guide{margin:12px 0 18px;padding:16px 19px;border:1px solid #cbdfe4;border-left:4px solid #007b85;border-radius:14px;background:#f5fafb;color:#27465d;min-width:0}
+.context-guide strong{display:block;font:800 1rem/1.3 Outfit,Arial,sans-serif;color:#00205b}
+.context-guide p{font-size:.87rem;line-height:1.63;margin:6px 0 9px}
+.context-guide button{margin-top:2px}
+.next-action{border-left-color:#ffb600;background:#fffdf5}
+.setup-card{padding:clamp(18px,3vw,30px);margin-top:19px}
+.setup-heading h2{margin:6px 0;color:#00205b}
+.setup-heading p{max-width:780px;color:#607486}
+.report-wizard-guide{padding:14px 17px;border-radius:12px;background:#eef7f7;margin:12px 0 17px}
+.report-wizard-guide>strong{display:block;color:#00205b;font-family:Outfit,sans-serif;font-size:1.02rem}
+.report-wizard-guide ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:0;list-style:none;counter-reset:step;margin:12px 0 0}
+.report-wizard-guide li{counter-increment:step;min-width:0;background:white;border:1px solid #dcebef;border-radius:10px;padding:10px;line-height:1.45;font-size:.8rem;overflow-wrap:anywhere}
+.report-wizard-guide li::before{content:counter(step);display:inline-grid;place-items:center;background:#007b85;color:white;border-radius:50%;width:22px;height:22px;margin-right:7px;font-weight:800}
+.report-design-fields{display:grid;gap:12px;margin:15px 0 10px}
+.report-design-fields .field{min-width:0}
+.report-design-fields label{color:#00205b;font-weight:800}
+.report-design-fields textarea{min-height:74px;line-height:1.58;resize:vertical}
+.subtle-save{font-size:.76rem;align-self:center}
+.component-shortcuts{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.component-shortcuts-title{color:#536f80;font-weight:800;font-size:.8rem;margin-right:3px}
+.shortcut{background:white;border:1px solid #cddde1;color:#006c77;border-radius:100px;padding:9px 13px;font-size:.77rem;font-weight:800;min-height:37px;max-width:100%;white-space:normal;text-align:center}
+.shortcut:hover,.shortcut:focus-visible{background:#eaf8f8;border-color:#007b85}
+.report-stage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}
+.report-stage-grid>div{background:#eff7f7;border-radius:10px;padding:11px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.report-stage-grid strong{font-size:.83rem;color:#00205b}
+.report-stage-grid span{color:#55718a;font-size:.75rem}
+@media(max-width:680px){
+ .report-wizard-guide ol{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .report-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .setup-card{padding:16px}
+ .component-shortcuts{gap:7px}
+ .shortcut{flex:1 1 calc(50% - 9px)}
+}
+@media(max-width:350px){
+ .report-wizard-guide ol{grid-template-columns:1fr}
+ .report-stage-grid{grid-template-columns:1fr}
+}
+@media print{
+ @page{size:A4 portrait;margin:15mm 14mm 16mm}
+ body{background:white!important}
+ #printSheet .guided-pdf,#printSheet .guided-pdf *{box-sizing:border-box!important}
+ #printSheet .guided-pdf{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  font-family:Arial,Helvetica,sans-serif!important;font-size:10pt!important;
+  line-height:1.48!important;color:#24384b!important;overflow:visible!important;
+  word-break:normal!important;overflow-wrap:break-word!important;
+ }
+ #printSheet .pdf-header{display:flex!important;justify-content:space-between!important;gap:14pt!important;align-items:center!important;border-bottom:2pt solid #007b85!important;padding:0 0 10pt!important;margin-bottom:12pt!important;break-inside:avoid-page!important}
+ #printSheet .pdf-brand{font-weight:900!important;font-size:12pt!important;letter-spacing:.01em!important;color:#00205b!important}
+ #printSheet .pdf-brand span{color:#007b85!important}
+ #printSheet .pdf-brand small{display:block!important;font-size:7pt!important;font-weight:700!important;letter-spacing:.02em!important;margin-top:3pt!important}
+ #printSheet .pdf-document-kind{text-align:right!important;font-size:8pt!important;line-height:1.35!important;font-weight:800!important;color:#007b85!important;flex:0 0 auto!important}
+ #printSheet .guided-pdf>h1{font:800 21pt/1.13 Arial,sans-serif!important;color:#00205b!important;margin:0 0 6pt!important;max-width:100%!important}
+ #printSheet .pdf-deck{font-size:10pt!important;color:#425f72!important;margin:0 0 13pt!important;max-width:100%!important}
+ #printSheet .pdf-meta{border:1px solid #cbdfe2!important;border-radius:8pt!important;padding:9pt!important;margin:0 0 16pt!important;display:grid!important;gap:4pt!important;break-inside:avoid-page!important}
+ #printSheet .pdf-meta b{font-size:10.5pt!important;color:#00205b!important}
+ #printSheet .pdf-meta span{font-size:8.4pt!important}
+ #printSheet .pdf-section{margin:0 0 18pt!important;padding:0!important;width:100%!important;max-width:100%!important;break-inside:auto!important}
+ #printSheet .pdf-section-head{display:flex!important;gap:9pt!important;align-items:start!important;border-bottom:1px solid #d8e5e8!important;padding-bottom:7pt!important;margin:0 0 9pt!important;break-after:avoid-page!important;page-break-after:avoid!important}
+ #printSheet .pdf-section-head>span{display:inline-grid!important;place-items:center!important;border-radius:6pt!important;background:#e9f6f5!important;border:1px solid #b1d1ce!important;color:#006875!important;width:31pt!important;height:30pt!important;flex:0 0 31pt!important;font-size:12pt!important;font-weight:900!important}
+ #printSheet .pdf-section-head>div{min-width:0!important;flex:1!important}
+ #printSheet .pdf-section-head h2{font:800 12.5pt/1.25 Arial,sans-serif!important;margin:0 0 3pt!important;color:#00205b!important}
+ #printSheet .pdf-section-head p{font-size:8.6pt!important;line-height:1.48!important;margin:0!important;color:#536b7b!important}
+ #printSheet .pdf-facts{display:grid!important;grid-template-columns:1fr!important;gap:0!important;width:100%!important;margin:0!important;padding:0!important}
+ #printSheet .pdf-facts>div{display:grid!important;grid-template-columns:38% minmax(0,1fr)!important;border-bottom:1px solid #dce5e9!important;padding:8pt 2pt!important;gap:12pt!important;max-width:100%!important;min-width:0!important;break-inside:avoid-page!important}
+ #printSheet .pdf-facts dt{font-weight:800!important;color:#00205b!important;font-size:8.9pt!important}
+ #printSheet .pdf-facts dd{margin:0!important;font-size:9.2pt!important;overflow-wrap:anywhere!important;min-width:0!important}
+ #printSheet .pdf-pending{color:#8b5f34!important;font-style:normal!important}
+ #printSheet .pdf-indicator-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9pt!important;min-width:0!important}
+ #printSheet .pdf-indicator{border:1px solid #d5e2e8!important;border-radius:8pt!important;padding:10pt!important;min-width:0!important;break-inside:avoid-page!important;page-break-inside:avoid!important;overflow-wrap:anywhere!important}
+ #printSheet .pdf-indicator strong{font-size:8.4pt!important;color:#244a5c!important;display:block!important}
+ #printSheet .pdf-indicator>b{font-size:17pt!important;line-height:1.2!important;font-weight:900!important;color:#00205b!important;display:block!important;margin:5pt 0!important}
+ #printSheet .pdf-indicator small{font-size:8pt!important;line-height:1.4!important;color:#476778!important;display:block!important}
+ #printSheet .pdf-indicator p{font-size:8.3pt!important;line-height:1.44!important;margin:6pt 0 0!important}
+ #printSheet .pdf-reading p{font-size:9.4pt!important;line-height:1.55!important;margin:0 0 8pt!important}
+ #printSheet .pdf-caution{border-left:3pt solid #e0a415!important;background:#fffbef!important;padding:9pt!important;font-size:9pt!important;line-height:1.5!important;margin:12pt 0!important;break-inside:avoid-page!important}
+ #printSheet .pdf-actions{display:grid!important;grid-template-columns:1fr!important;gap:9pt!important}
+ #printSheet .pdf-action{border:1px solid #ccdade!important;padding:10pt!important;border-radius:8pt!important;min-width:0!important;break-inside:avoid-page!important;page-break-inside:avoid!important}
+ #printSheet .pdf-action-head{display:flex!important;justify-content:space-between!important;gap:9pt!important;align-items:baseline!important;border-bottom:1px solid #e2eaec!important;padding-bottom:5pt!important}
+ #printSheet .pdf-action-head b{color:#00205b!important;font-size:9.5pt!important}
+ #printSheet .pdf-action-head span{font-size:8pt!important;font-weight:800!important}
+ #printSheet .pdf-action p{font-size:8.7pt!important;line-height:1.45!important;margin:6pt 0 0!important}
+ #printSheet .pdf-check{background:#f4f8f8!important;padding:6pt!important;border-radius:4pt!important;overflow-wrap:anywhere!important}
+ #printSheet .pdf-next{border:1px solid #d4e5e5!important;background:#f4fafa!important;padding:11pt!important;border-radius:7pt!important;font-size:9.4pt!important;line-height:1.55!important;break-inside:avoid-page!important}
+ #printSheet .pdf-next p{margin:6pt 0 0!important}
+ #printSheet .pdf-empty{font-size:9.5pt!important;padding:9pt!important;border:1px dashed #bdcbd3!important}
+ #printSheet .pdf-footer{margin-top:20pt!important;border-top:1px solid #cbdcdf!important;padding-top:9pt!important;font-size:7.6pt!important;line-height:1.5!important;color:#567080!important}
+}
