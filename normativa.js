@@ -2,6 +2,21 @@
 'use strict';
 /* Bloques agregados de vigilancia para informes técnicos: no almacena datos clínicos individualizados. */
 Object.assign(DATA_TYPES, {
+ psicosocial:{
+  name:'Condiciones psicosociales y organización del trabajo',
+  module:'Módulo 3 · Factores psicosociales',
+  short:'Psicosocial',
+  description:'Vigilancia colectiva de condiciones organizacionales: carga de trabajo, turnos, autonomía, relaciones y apoyo. Estos recuentos no son diagnósticos, ni demuestran causalidad.',
+  rule:'Una fila por período × área × factor × método aplicado. Personas evaluadas ≤ personas elegibles; personas con señal ≤ evaluadas. Señal significa respuesta que cumple un criterio previamente definido para revisión, NO una enfermedad. Define instrumento, criterio y acciones fuera de la plantilla; protege los grupos pequeños.',
+  columns:['periodo','area','factor','metodo','personas_elegibles','personas_evaluadas','personas_con_senal','medidas_programadas','medidas_verificadas'],
+  numeric:['personas_elegibles','personas_evaluadas','personas_con_senal','medidas_programadas','medidas_verificadas'],
+  key:['periodo','area','factor','metodo'],
+  sample:[
+   ['2026-09','Operaciones','Carga de trabajo','Encuesta de condiciones de trabajo',52,44,16,3,1],
+   ['2026-09','Mantenimiento','Cambios de turno','Entrevista colectiva estructurada',35,28,11,2,1],
+   ['2026-09','Administración','Autonomía y apoyo','Encuesta de condiciones de trabajo',28,23,7,2,0]
+  ]
+ },
  evaluaciones_medicas:{
   name:'Evaluaciones médicas ocupacionales',module:'Salud · NT-03:2016 arts. 26–30',short:'Exámenes ocupacionales',
   description:'Control agregado de exámenes de ingreso, prevacacionales, posvacacionales, egreso, exposición ocupacional y periódicos programados según riesgos. No se cargan fichas, diagnósticos ni resultados médicos individuales.',
@@ -74,6 +89,12 @@ const parentValidate=validate;
 validate=function(k,input){
  let r=parentValidate(k,input);
  if(typeof r==='string')return r;
+ if(k==='psicosocial'){
+  if(r.personas_elegibles===0)return 'personas_elegibles debe ser mayor que cero';
+  if(r.personas_evaluadas>r.personas_elegibles)return 'personas_evaluadas no puede superar personas_elegibles';
+  if(r.personas_con_senal>r.personas_evaluadas)return 'personas_con_senal no puede superar personas_evaluadas';
+  if(r.medidas_verificadas>r.medidas_programadas)return 'medidas_verificadas no puede superar medidas_programadas';
+ }
  if(k==='evaluaciones_medicas'){
  const validTypes=['Ingreso','Prevacacional','Posvacacional','Egreso','Periódica por exposición','Anual programada','Otra programada'];
  if(!validTypes.includes(r.tipo_evaluacion))return 'tipo_evaluacion: selecciona una de las categorías de la plantilla';
