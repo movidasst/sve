@@ -20,6 +20,7 @@
 <script defer src="./app.js"></script>
 <script defer src="./normativa.js"></script>
 <script defer src="./reportes.js"></script>
+<script defer src="./demo.js"></script>
 <title>SVE · Laboratorio de vigilancia epidemiológica | La Movida SST</title>
 </head>
 <body>
@@ -31,6 +32,7 @@
   </a>
   <div class="top-actions"><span class="private-label">◉ Datos locales</span><button class="btn quiet mini install-btn" id="installApp" type="button" title="Instalar SVE en tu dispositivo">＋ Instalar</button><button class="icon-btn" id="helpTop" type="button" title="Guía rápida" aria-label="Abrir guía rápida">?</button></div>
 </header>
+<div id="demoStatusBar" class="demo-status" hidden><span>CASO FICTICIO · JUL–SEP 2026 · NO UTILIZAR COMO DATOS REALES</span><button type="button" id="clearDemoTop" class="demo-top-exit">Salir de demo</button></div>
 <main id="main">
 <section id="panel-inicio" class="panel active" aria-labelledby="titulo-inicio">
   <div class="hero">
@@ -40,6 +42,11 @@
       <div class="hero-actions"><button class="btn yellow" id="goLoad" type="button">Comenzar con mis datos <span aria-hidden="true">›</span></button><button class="btn outline-light" id="goDemo" type="button">Explorar un caso de ejemplo</button></div>
     </div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="pulse-mark">SVE<span>360°</span></div><span class="hero-dot dot1"></span><span class="hero-dot dot2"></span></div>
   </div>
+  <section class="demo-mode-panel" id="demoModePanel" aria-label="Demostración completa del SVE">
+   <div class="demo-mode-mark" aria-hidden="true">▤</div>
+   <div class="demo-mode-body"><span class="eyebrow teal">ENTORNO DE PRUEBAS · 100 % DATOS FICTICIOS</span><h2 id="demoModeTitle">Prueba un SVE completo, sin ingresar datos reales</h2><p id="demoModeCopy">Carga un trimestre simulado con los registros, indicadores, exámenes médicos, acciones e informes para explorar toda la aplicación.</p><p id="demoStats" class="demo-stats">Trimestre ficticio julio–septiembre 2026 · sin datos personales</p>
+   <div class="demo-controls"><button class="btn primary" type="button" id="loadCompleteDemo">▶ Cargar demostración completa</button><button class="btn secondary" type="button" id="goDemoReports">Ver informes de la demostración</button><button class="btn danger-outline" id="exitCompleteDemo" type="button" hidden>✕ Borrar demo y comenzar con mis datos</button></div></div>
+  </section>
   <div class="section-heading"><span class="eyebrow teal">RUTA DE APRENDIZAJE APLICADA</span><h2>De la señal inicial a la mejora</h2><p>El mismo hilo conductor de los cuatro módulos y la clase especial de estadística.</p></div>
   <div class="journey" id="journey">
     <div class="journey-item"><b>01</b><strong>Definir</strong><small>Evento, población, período y objetivo</small></div>
@@ -164,7 +171,19 @@
 
   <div class="card">
     <h2>Administrar datos locales</h2><p class="muted">Esta app mantiene resúmenes agregados en este navegador. Puedes exportarlos para transferirlos a otro equipo. Borrar los datos locales no altera ningún archivo que hayas descargado.</p>
-    <div class="button-line"><button id="loadDemoReports" type="button" class="btn quiet">Probar con datos ficticios</button><button id="clearAll" type="button" class="btn danger-outline">Eliminar todos los datos locales</button></div>
+    <div class="demo-report-controls">
+      <strong>Demostración integral (julio–septiembre 2026)</strong>
+      <p class="muted">Abre cualquiera de los cuatro documentos precargados, revisa su contenido y utiliza «PDF (imprimir)», Word o Excel. Todos los registros y soportes de esta demostración son ficticios.</p>
+      <div class="demo-report-shortcuts">
+        <button type="button" class="btn quiet" data-demo-report="mensual">Informe mensual de salud</button>
+        <button type="button" class="btn quiet" data-demo-report="trimestral_salud">Trimestral accidentes y enfermedades</button>
+        <button type="button" class="btn quiet" data-demo-report="trimestral_tiempo">Trimestral tiempo libre</button>
+        <button type="button" class="btn quiet" data-demo-report="interno">Informe integral interno</button>
+      </div>
+      <div class="button-line"><button id="loadDemoReports" type="button" class="btn primary">▶ Cargar trimestre demo completo</button><button id="exitDemoReports" type="button" class="btn danger-outline" hidden>✕ Borrar demo y comenzar con mis datos</button></div>
+    </div>
+    <hr class="demo-separator">
+    <div class="button-line"><button id="clearAll" type="button" class="btn danger-outline">Eliminar todos mis datos locales</button></div>
   </div>
 </section>
 </main>
