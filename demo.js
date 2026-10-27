@@ -14,13 +14,14 @@ const AREAS=[
 const ORG='Industrias Horizonte · EMPRESA FICTICIA PARA DEMOSTRACIÓN';
 const FORM=[
  'formalType','formalPeriod','formalQuarter','formalYear','formalOrg',
- 'formalResponsible','formalParticipation','formalMethod','formalDecision'
+ 'formalResponsible','formalParticipation','formalMethod','formalHypothesis','formalDecision'
 ];
 const DEMO_CONFIG={
  formalType:'trimestral_salud',formalPeriod:'2026-09',formalQuarter:'3',formalYear:'2026',
  formalOrg:ORG,formalResponsible:'Servicio de Seguridad y Salud en el Trabajo (simulado)',
  formalParticipation:'con',
  formalMethod:'CASO FICTICIO. Consolidación mensual por área, proceso y tipo de evento (julio–septiembre de 2026). Datos numéricos agregados provenientes de registros didácticos. Se analiza morbilidad por cortes mensuales, eventos, exámenes ocupacionales, reposos, exposiciones, utilización del tiempo libre y desempeño de controles. La historia de salud individual no está alojada en esta aplicación.',
+ formalHypothesis:'CASO FICTICIO. Se observa coincidencia temporal entre condiciones organizacionales, horas extraordinarias y reportes de malestar. Esta asociación descriptiva no demuestra causa. Investigar cargas reales, cambios de turno, descansos y otros factores, con evaluaciones periódicas y participación de trabajadores antes de atribuir un origen.',
  formalDecision:'CASO FICTICIO. Priorizar el control ergonómico en operaciones, comprobar la efectividad del sistema de extracción en mantenimiento, corregir los exámenes prevacacionales pendientes y verificar el disfrute de descansos. Registrar mediciones y repetir la evaluación antes de atribuir relaciones causales.'
 };
 const backupExists=()=>!!localStorage.getItem(BACKUP_KEY);
@@ -43,6 +44,7 @@ function populate(){
    push('procesos',[month,area.name,area.process,6+base,3+(base%5),5+(p%2),3+(base%2)]);
    const plannedVacation=12+a*4+p*3,usedVacation=plannedVacation-(a===1?4:2+p);
    push('tiempo',[month,area.name,count,count-2-(base%4),Math.round(count*(2.2+(base%3))),plannedVacation,usedVacation]);
+   push('psicosocial',[month,area.name,a===0?'Carga y ritmo de trabajo':a===1?'Turnos y previsibilidad':'Autonomía y apoyo','Encuesta agregada de organización',count,count-5-(base%3),7+base,3,1+(base%2)]);
    for(const activity of ['Evaluación de salud','Inducción preventiva']){
      const enrolled=count,completed=count-(activity==='Evaluación de salud'?4+(base%3):2+(base%4));
      push('cobertura',[month,area.name,activity,enrolled,completed]);
