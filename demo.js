@@ -166,6 +166,7 @@ function updateDisplay(){
 function openReport(type){
  if(!['mensual','trimestral_salud','trimestral_tiempo','interno'].includes(type))type='trimestral_salud';
  if(typeof go==='function')go('informes');
+ const advanced=document.getElementById('advancedReports');if(advanced)advanced.open=true;
  const select=document.getElementById('formalType');
  if(select){select.value=type;select.dispatchEvent(new Event('change',{bubbles:true}));}
  const month=document.getElementById('formalPeriod');
