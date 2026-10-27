@@ -2,6 +2,22 @@
 'use strict';
 /* Bloques agregados de vigilancia para informes técnicos: no almacena datos clínicos individualizados. */
 Object.assign(DATA_TYPES, {
+ evaluaciones_medicas:{
+  name:'Evaluaciones médicas ocupacionales',module:'Salud · NT-03:2016 arts. 26–30',short:'Exámenes ocupacionales',
+  description:'Control agregado de exámenes de ingreso, prevacacionales, posvacacionales, egreso, exposición ocupacional y periódicos programados según riesgos. No se cargan fichas, diagnósticos ni resultados médicos individuales.',
+  rule:'Una fila por período × área × tipo × proceso/criterio. Programadas = evaluaciones a ejecutar; realizadas = evaluaciones efectivamente hechas; realizadas_en_plazo = evaluaciones ejecutadas dentro del plazo aplicable (arts. 29–30: 15 días hábiles previos/posteriores). La periodicidad «anual» proviene del programa y riesgos, no es regla universal. La cantidad pendiente se calcula automáticamente.',
+  columns:['periodo','area','tipo_evaluacion','proceso_o_criterio','programadas','realizadas','realizadas_en_plazo','con_seguimiento'],
+  numeric:['programadas','realizadas','realizadas_en_plazo','con_seguimiento'],
+  key:['periodo','area','tipo_evaluacion','proceso_o_criterio'],
+  sample:[
+    ['2026-09','Operaciones','Prevacacional','Programa de vacaciones',20,18,16,3],
+    ['2026-09','Operaciones','Posvacacional','Reintegro de vacaciones',15,13,12,1],
+    ['2026-09','Mantenimiento','Periódica por exposición','Ruido ocupacional',24,20,19,4],
+    ['2026-09','Administración','Anual programada','Programa de vigilancia del centro',30,26,25,2],
+    ['2026-09','Mantenimiento','Ingreso','Valoración según puesto',5,5,5,0],
+    ['2026-09','Operaciones','Egreso','Valoración según puesto',2,2,2,0]
+  ]
+ },
  eventos_salud:{
   name:'Enfermedades y accidentes comunes · consolidado',module:'Salud y eventos · Reglamento art. 34',short:'Eventos de salud',
   description:'Registra en forma agregada los episodios de enfermedades comunes, enfermedades ocupacionales calificadas, sospechas en investigación y accidentes comunes. La clasificación de origen ocupacional exige respaldo de la autoridad competente.',
@@ -58,6 +74,13 @@ const parentValidate=validate;
 validate=function(k,input){
  let r=parentValidate(k,input);
  if(typeof r==='string')return r;
+ if(k==='evaluaciones_medicas'){
+ const validTypes=['Ingreso','Prevacacional','Posvacacional','Egreso','Periódica por exposición','Anual programada','Otra programada'];
+ if(!validTypes.includes(r.tipo_evaluacion))return 'tipo_evaluacion: selecciona una de las categorías de la plantilla';
+ if(r.realizadas>r.programadas)return 'realizadas excede programadas: revisa o actualiza la planificación';
+ if(r.realizadas_en_plazo>r.realizadas)return 'realizadas_en_plazo no puede exceder realizadas';
+ if(r.con_seguimiento>r.realizadas)return 'con_seguimiento no puede exceder realizadas';
+ }
  if(k==='eventos_salud'){
    if(!['Enfermedad común','Enfermedad ocupacional calificada','Sospecha de origen ocupacional','Accidente común'].includes(r.categoria))
      return 'categoria: use Enfermedad común, Enfermedad ocupacional calificada, Sospecha de origen ocupacional o Accidente común';
