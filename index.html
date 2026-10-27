@@ -18,6 +18,8 @@
 <link rel="stylesheet" href="./styles.css">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer src="./app.js"></script>
+<script defer src="./normativa.js"></script>
+<script defer src="./reportes.js"></script>
 <title>SVE · Laboratorio de vigilancia epidemiológica | La Movida SST</title>
 </head>
 <body>
@@ -125,6 +127,39 @@
     <p class="fine-print">El PDF se obtiene mediante la función de impresión del navegador («Guardar como PDF»). Excel exporta las hojas de datos y de acciones.</p>
   </div>
   <div id="reportPreview" class="report-preview"></div>
+<section class="formal-module">
+  <div class="formal-heading"><span class="eyebrow teal">REPORTES TÉCNICOS Y MATRIZ NORMATIVA</span><h2>Generador documental SVE</h2><p class="muted">Prepara informes separados conforme al tipo de vigilancia. Un borrador técnico no reemplaza los formatos oficiales ni acredita por sí solo el cumplimiento normativo.</p></div>
+  <div class="card" id="formalConfiguration">
+    <div class="form-grid">
+      <div class="field"><label for="formalType">Tipo de informe</label><select id="formalType">
+        <option value="mensual">Salud · divulgación mensual</option>
+        <option value="trimestral_salud">Accidentes y enfermedades · soporte trimestral</option>
+        <option value="trimestral_tiempo">Utilización del tiempo libre · soporte trimestral</option>
+        <option value="interno">Consolidado integral interno</option>
+      </select></div>
+      <div class="field"><label for="formalPeriod">Mes de corte</label><input id="formalPeriod" type="month"></div>
+      <div class="field"><label for="formalQuarter">Trimestre</label><select id="formalQuarter"><option value="1">I · enero–marzo</option><option value="2">II · abril–junio</option><option value="3">III · julio–septiembre</option><option value="4">IV · octubre–diciembre</option></select></div>
+      <div class="field"><label for="formalYear">Año</label><input id="formalYear" inputmode="numeric" type="number" min="2000" max="2100" value="2026"></div>
+      <div class="field span-2"><label for="formalOrg">Empresa o centro de trabajo</label><input id="formalOrg" maxlength="110" placeholder="Denominación del centro de trabajo"></div>
+      <div class="field"><label for="formalResponsible">Unidad responsable (sin nombre personal)</label><input id="formalResponsible" maxlength="95" value="Servicio de Seguridad y Salud en el Trabajo"></div>
+      <div class="field"><label for="formalParticipation">Participación y revisión</label><select id="formalParticipation"><option value="sin">Pendiente de documentar</option><option value="con">Acta o evidencia institucional disponible</option><option value="revision">En proceso de revisión por instancias competentes</option></select></div>
+      <div class="field span-2"><label for="formalMethod">Método y criterios de vigilancia</label><textarea id="formalMethod" maxlength="700" placeholder="Definición de eventos, fuentes, calidad de registros, población, periodicidad. No registrar información clínica individual."></textarea></div>
+      <div class="field span-2"><label for="formalDecision">Análisis profesional y recomendaciones</label><textarea id="formalDecision" maxlength="1100" placeholder="Describa hallazgos y decisiones sustentadas en datos. No atribuya causalidad sin investigación."></textarea></div>
+    </div>
+    <div class="button-line formal-buttons">
+      <button type="button" id="formalGenerate" class="btn primary">▤ Generar informe técnico</button>
+      <button type="button" id="formalPDF" class="btn secondary">↓ PDF (imprimir)</button>
+      <button type="button" id="formalWord" class="btn quiet">↓ Word editable (.doc)</button>
+      <button type="button" id="formalExcel" class="btn quiet">↓ Excel + matriz</button>
+    </div>
+    <p class="fine-print">Los informes trimestrales son <strong>documentos técnicos de soporte</strong>. Para consignar ante el INPSASEL deben utilizarse los formatos y canales oficiales aplicables; la aplicación no envía informes ni certifica cumplimiento.</p>
+  </div>
+  <div class="card"><div class="card-head"><div><h2>Matriz normativa y evidencias</h2><p class="muted">La presencia de datos no prueba automáticamente cumplimiento. Registra la referencia documental y el estado de revisión de cada obligación.</p></div></div>
+    <div id="normMatrix" class="norm-matrix"></div>
+  </div>
+  <div id="formalPreview" class="formal-preview card" aria-live="polite"><p class="muted">Selecciona el período y pulsa «Generar informe técnico».</p></div>
+</section>
+
   <div class="card">
     <h2>Administrar datos locales</h2><p class="muted">Esta app mantiene resúmenes agregados en este navegador. Puedes exportarlos para transferirlos a otro equipo. Borrar los datos locales no altera ningún archivo que hayas descargado.</p>
     <div class="button-line"><button id="loadDemoReports" type="button" class="btn quiet">Probar con datos ficticios</button><button id="clearAll" type="button" class="btn danger-outline">Eliminar todos los datos locales</button></div>
