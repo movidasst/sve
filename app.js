@@ -49,7 +49,7 @@ const DATA_TYPES = {
 };
 const STORE_KEY='movidasst_sve_v1';let installPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});
 const emptyDB=()=>Object.fromEntries(Object.keys(DATA_TYPES).map(k=>[k,[]]));
-let db=emptyDB(),actions=[],dataset='morbilidad',filter={period:'',area:'',condition:'',activity:''},isDemo=false,toastTimer;
+let db=emptyDB(),actions=[],dataset='morbilidad',filter={period:'',area:'',condition:'',activity:''},isDemo=false,toastTimer,reportDesign={question:'',definition:'',alert:''};
 const $=(s,base=document)=>base.querySelector(s);
 const $$=(s,base=document)=>Array.from(base.querySelectorAll(s));
 const htmlEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -62,9 +62,31 @@ const latestPeriod=()=>[...new Set(Object.values(db).flat().map(r=>r.periodo))].
 const option=(value,label,selected)=>'<option value="'+htmlEsc(value)+'"'+(selected?' selected':'')+'>'+htmlEsc(label)+'</option>';
 const hasData=()=>Object.values(db).some(a=>a.length)||actions.length;
 function notify(s){const x=$('#toast');x.textContent=s;x.classList.add('shown');clearTimeout(toastTimer);toastTimer=setTimeout(()=>x.classList.remove('shown'),4200)}
-function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify({db,actions,isDemo}))}catch(e){notify('No se pudo conservar todo el conjunto localmente. Exporta un respaldo.')}}
-function load(){try{const old=JSON.parse(localStorage.getItem(STORE_KEY)||'null');if(old&&old.db){for(const k of Object.keys(DATA_TYPES))db[k]=Array.isArray(old.db[k])?old.db[k]:[];actions=Array.isArray(old.actions)?old.actions:[];isDemo=!!old.isDemo}}catch(e){db=emptyDB();actions=[]}}
-function go(tab){const key=['inicio','datos','indicadores','acciones','informes'].includes(tab)?tab:'inicio';$$('.panel').forEach(x=>x.classList.toggle('active',x.id==='panel-'+key));$$('.nav-item').forEach(x=>{let active=x.dataset.tab===key;x.classList.toggle('active',active);if(active)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')});if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});if(key==='inicio')renderHome();if(key==='datos')renderData();if(key==='indicadores')renderIndicators();if(key==='acciones')renderActions();if(key==='informes')renderReport()}
+function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify({db,actions,isDemo,reportDesign}))}catch(e){notify('No se pudo conservar todo el conjunto localmente. Exporta un respaldo.')}}
+function load(){try{const old=JSON.parse(localStorage.getItem(STORE_KEY)||'null');if(old&&old.db){for(const k of Object.keys(DATA_TYPES))db[k]=Array.isArray(old.db[k])?old.db[k]:[];actions=Array.isArray(old.actions)?old.actions:[];reportDesign=old.reportDesign&&typeof old.reportDesign==='object'?{question:String(old.reportDesign.question||'').slice(0,450),definition:String(old.reportDesign.definition||'').slice(0,450),alert:String(old.reportDesign.alert||'').slice(0,450)}:{question:'',definition:'',alert:''};isDemo=!!old.isDemo}}catch(e){db=emptyDB();actions=[];reportDesign={question:'',definition:'',alert:''}}}
+function go(tab){const key=['inicio','datos','indicadores','acciones','informes'].includes(tab)?tab:'inicio';$$('.panel').forEach(x=>x.classList.toggle('active',x.id==='panel-'+key));$$('.nav-item').forEach(x=>{let active=x.dataset.tab===key;x.classList.toggle('active',active);if(active)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')});if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});if(key==='inicio')renderHome();if(key==='datos')renderData();if(key==='indicadores')renderIndicators();if(key==='acciones')renderActions();if(key==='informes')renderReport();renderGuides()}
+
+function setGuide(id,title,message,target,label){
+ const node=$('#'+id);if(!node)return;
+ node.innerHTML='<strong>'+htmlEsc(title)+'</strong><p>'+htmlEsc(message)+'</p>'+(target?'<button type="button" class="btn secondary mini" data-guide-tab="'+htmlEsc(target)+'">'+htmlEsc(label)+' →</button>':'');
+}
+function renderGuides(){
+ const total=Object.values(db).reduce((a,v)=>a+v.length,0),complete=Object.values(reportDesign).filter(x=>String(x).trim()).length;
+ const verified=actions.filter(a=>a.status==='Verificada').length;
+ if(complete===0)setGuide('guidedNext','Empieza aquí · Definir','Escribe qué quieres vigilar, qué contarás como caso o evento y qué señal activa una revisión. No necesitas cifras todavía.',null,'');
+ else if(total===0)setGuide('guidedNext','Siguiente · Registrar','Ya comenzaste la ficha de diseño ('+complete+'/3 campos). Elige un componente y carga un primer registro de prueba o un resumen agregado.','datos','Ir a mis datos');
+ else if(actions.length===0)setGuide('guidedNext','Siguiente · Interpretar','Tienes '+total+' registros agregados. Revisa indicadores, denominadores y límites antes de decidir controles.','indicadores','Revisar indicadores');
+ else if(verified===0)setGuide('guidedNext','Siguiente · Verificar','Ya documentaste '+actions.length+' acciones. Comprueba resultados frente a un criterio y guarda la evidencia de verificación.','acciones','Verificar mis acciones');
+ else setGuide('guidedNext','Siguiente · Documentar','Tienes '+total+' registros, '+actions.length+' acciones y '+verified+' verificadas. Puedes generar un informe que conserve la secuencia desde el problema hasta la mejora.','informes','Preparar mi informe');
+ const d=db[dataset]||[];
+ setGuide('dataGuide','1 · Selecciona, 2 · registra, 3 · comprueba',d.length?'Hay '+d.length+' registros de «'+DATA_TYPES[dataset].name+'». Revisa unidades, duplicados, fechas y fuentes; después interpreta los resultados.':'Para «'+DATA_TYPES[dataset].name+'», primero lee qué mide la plantilla. Descarga un ejemplo, completa datos agregados por área y período, impórtalos o usa el formulario manual.',d.length?'indicadores':null,d.length?'Interpretar estos datos':'');
+ if(total===0)setGuide('indicatorGuide','Primero necesitamos datos comparables','Aún no hay registros agregados para analizar. Carga un componente con su población, evento y período; no interpretes cifras inexistentes.','datos','Registrar información');
+ else setGuide('indicatorGuide','Lee cada indicador en orden','Comprueba qué se contó (numerador), sobre quiénes o qué se calculó (denominador), el período y la calidad de los registros. Un aumento o asociación no demuestra por sí mismo la causa.','acciones','Definir medidas preventivas');
+ if(actions.length===0)setGuide('actionGuide','Del resultado a la prevención','Comienza con un hallazgo comprobable y describe el control sobre la tarea o la organización, quién lo hará y qué evidencia demostrará su funcionamiento. No basta con anotar una capacitación o reparación.',total?'indicadores':'datos',total?'Volver a los indicadores':'Registrar primero');
+ else setGuide('actionGuide','Cerrar solo después de comprobar','Tienes '+actions.length+' acciones, de las cuales '+verified+' están verificadas. Una orden de trabajo o una actividad cumplida no demuestra necesariamente eficacia; registra evidencia del desempeño obtenido.','informes','Documentar el seguimiento');
+ const status=$('#reportGuideStatus');if(status){status.innerHTML='<strong>Estado de la preparación del informe</strong><p>'+htmlEsc(complete===3?'Definiste las tres preguntas iniciales.':complete+'/3 elementos de la ficha inicial completados; los restantes figurarán como pendientes.')+' '+htmlEsc(total+' registros cargados y '+actions.length+' acciones documentadas.')+'</p>';}
+}
+
 function renderHome(){const rows=Object.values(db).reduce((a,v)=>a+v.length,0),open=actions.filter(a=>a.status!=='Verificada').length;$('#homeStats').innerHTML=[[''+Object.values(db).filter(a=>a.length).length,'Componentes con datos'],[''+rows,'Registros agregados'],[''+open,'Acciones por verificar']].map(([value,label])=>'<div class="stat-card"><div class="value">'+htmlEsc(value)+'</div><span>'+htmlEsc(label)+'</span></div>').join('');}
 function updateDatasetSelect(){
  const groups=[
@@ -77,7 +99,7 @@ function updateDatasetSelect(){
  $('#datasetSelect').innerHTML=groups.map(([label,keys])=>'<optgroup label="'+htmlEsc(label)+'">'+keys.filter(k=>DATA_TYPES[k]).map(k=>option(k,DATA_TYPES[k].name,k===dataset)).join('')+'</optgroup>').join('');
  $('#aModule').innerHTML=Object.entries(DATA_TYPES).map(([k,v])=>option(k,v.name,false)).join('');
 }
-function renderData(){const m=DATA_TYPES[dataset];$('#datasetSelect').value=dataset;$('#datasetTitle').textContent=m.name;$('#datasetExplain').textContent=m.description;$('#datasetRule').textContent='Cómo completar el formato: '+m.rule;$('#datasetCount').textContent=db[dataset].length;renderManualFields();renderDataTable()}
+function renderData(){const m=DATA_TYPES[dataset];$('#datasetSelect').value=dataset;$('#datasetTitle').textContent=m.name;$('#datasetExplain').textContent=m.description;$('#datasetRule').textContent='Cómo completar el formato: '+m.rule;$('#datasetCount').textContent=db[dataset].length;renderManualFields();renderDataTable();renderGuides()}
 function renderManualFields(){
  const m=DATA_TYPES[dataset],sets={
   categoria:['Enfermedad común','Enfermedad ocupacional calificada','Sospecha de origen ocupacional','Accidente común'],
@@ -205,8 +227,19 @@ function ready(){
  $('#actionForm').addEventListener('submit',e=>{e.preventDefault();const a={id:'a'+Date.now()+Math.random().toString(36).slice(2,7),module:$('#aModule').selectedOptions[0].text,priority:$('#aPriority').value,finding:$('#aFinding').value.trim(),measure:$('#aMeasure').value.trim(),owner:$('#aOwner').value.trim(),due:$('#aDue').value,evidence:$('#aEvidence').value.trim(),status:'Pendiente'};if([a.finding,a.measure,a.owner,a.due,a.evidence].some(x=>!x)){notify('Completa los campos de la acción.');return}actions.push(a);persist();e.currentTarget.reset();renderActions();notify('Acción registrada. Incluye seguimiento y evidencias.')});
  $('#actionsList').addEventListener('change',e=>{const id=e.target.dataset.actionStatus;if(!id)return;const a=actions.find(x=>x.id===id);if(a){a.status=e.target.value;persist();renderActions()}});
  $('#actionsList').addEventListener('click',e=>{const b=e.target.closest('[data-action-delete]');if(!b)return;if(!confirm('¿Eliminar esta acción?'))return;actions=actions.filter(a=>a.id!==b.dataset.actionDelete);persist();renderActions()});
+
+ for(const [id,key] of [['reportQuestion','question'],['reportCaseDefinition','definition'],['reportAlert','alert']]){
+  const field=$('#'+id);if(!field)continue;field.value=reportDesign[key]||'';
+  field.addEventListener('input',()=>{reportDesign[key]=field.value.slice(0,450);persist();renderGuides();if($('#panel-informes').classList.contains('active'))renderReport()});
+ }
+ $('#continueToData')?.addEventListener('click',()=>go('datos'));
+ document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-guide-tab]');if(b){go(b.dataset.guideTab);return}
+  const choice=e.target.closest('[data-select-dataset]');if(choice){dataset=choice.dataset.selectDataset;go('datos');}
+ });
+
  $('#reportOrganization').addEventListener('input',()=>{renderReport();persist()});$('#printReport').addEventListener('click',()=>{buildPrintable();window.print()});$('#exportWorkbook').addEventListener('click',exportAll);$('#downloadBackup').addEventListener('click',()=>{for(const k of Object.keys(DATA_TYPES))dl(datasetCSV(k),'SVE_'+k+'.csv','text/csv;charset=utf-8');exportActionsCSV();notify('Respaldo CSV exportado por componente.');});
- $('#clearAll').addEventListener('click',()=>{if(!confirm('¿Borrar definitivamente los registros y las acciones guardados en este navegador? Exporta un respaldo antes.'))return;db=emptyDB();actions=[];filter={period:'',area:'',condition:'',activity:''};isDemo=false;persist();go('inicio');notify('Datos locales eliminados.')});
+ $('#clearAll').addEventListener('click',()=>{if(!confirm('¿Borrar definitivamente los registros y las acciones guardados en este navegador? Exporta un respaldo antes.'))return;db=emptyDB();actions=[];filter={period:'',area:'',condition:'',activity:''};reportDesign={question:'',definition:'',alert:''};isDemo=false;persist();go('inicio');notify('Datos locales eliminados.')});
  renderHome();renderData();go(location.hash.slice(1)||'inicio');
  if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
