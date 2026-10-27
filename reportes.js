@@ -233,6 +233,9 @@ function init(){
  el('formalPDF').addEventListener('click',exportPDF);
  el('formalWord').addEventListener('click',exportWord);
  el('formalExcel').addEventListener('click',exportExcel);
+ el('formalPDFBottom').addEventListener('click',exportPDF);
+ el('formalWordBottom').addEventListener('click',exportWord);
+ el('formalExcelBottom').addEventListener('click',exportExcel);
  for(const id of ['formalType','formalPeriod','formalQuarter','formalYear','formalOrg','formalResponsible','formalParticipation','formalMethod','formalDecision']){
   el(id).addEventListener('change',()=>{saveConfig();refresh()});
  }
