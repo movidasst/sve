@@ -30,11 +30,18 @@ function render(){
  root.querySelector('#learnOpenData')?.addEventListener('click',()=>{document.querySelector('[data-tab="datos"]')?.click();const sel=document.getElementById('datasetSelect');if(sel){sel.value=current;sel.dispatchEvent(new Event('change',{bubbles:true}))}document.getElementById('datasetExplain')?.scrollIntoView({behavior:'smooth',block:'center'})});
  root.querySelector('#learnOpenDemo')?.addEventListener('click',()=>document.getElementById('loadCompleteDemo')?.click());
 }
+function detailForSelected(){
+ const sel=document.getElementById('datasetSelect'),host=document.getElementById('dataFieldGuide');if(!sel||!host)return;
+ const d=datasetDefs()[sel.value];if(!d){host.innerHTML='';return}
+ host.innerHTML='<details class="learn-data-helper" open><summary><b>Antes de llenar esta plantilla: significado, fuente y ejemplo</b></summary><p>'+esc(d.description)+'</p><p><b>Comprueba:</b> '+esc(d.rule||'La unidad y el período de cada registro.')+'</p><div class="learn-fields">'+(d.columns||[]).map((k,i)=>'<details><summary>'+esc(k.replaceAll('_',' '))+'</summary><p>'+esc(fieldInfo(k))+'</p><p><b>Ejemplo ficticio:</b> '+esc(d.sample?.[0]?.[i]??'—')+'</p></details>').join('')+'</div><p class="learn-privacy">Los registros individuales de salud y tiempo libre se custodian fuera de esta aplicación. No subas datos identificables.</p></details>';
+}
 function init(){const start=document.getElementById('sveSetup');if(!start||document.getElementById('sveLearning'))return;
  const root=document.createElement('section');root.className='card sve-learning';root.id='sveLearning';root.setAttribute('aria-label','Guía de construcción del sistema de vigilancia epidemiológica');
  start.parentNode.insertBefore(root,start);render();
  const reminder=document.createElement('div');reminder.className='learn-dataset-reminder';reminder.innerHTML='<b>¿No sabes qué datos cargar?</b> Consulta la guía de ámbitos, fuentes y significado de cada variable. <button class="btn quiet mini" type="button" id="returnLearning">Abrir guía</button>';
  const data=document.getElementById('panel-datos');const head=data?.querySelector('.page-lead');head?.insertAdjacentElement('afterend',reminder);
+ const dataCard=data?.querySelector('.card');if(dataCard){const helper=document.createElement('div');helper.id='dataFieldGuide';helper.className='card learn-context';dataCard.insertAdjacentElement('afterend',helper);detailForSelected();document.getElementById('datasetSelect')?.addEventListener('change',detailForSelected)}
+
  reminder.querySelector('button')?.addEventListener('click',()=>{document.querySelector('[data-tab="inicio"]')?.click();document.getElementById('sveLearning')?.scrollIntoView({block:'start',behavior:'smooth'})});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
