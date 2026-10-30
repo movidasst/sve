@@ -265,3 +265,35 @@
 .advanced-formal[open]>.advanced-summary{border-bottom:1px solid #d9e8e9;background:#f1fafa}
 .advanced-content{padding:17px 20px 25px}
 @media(max-width:570px){.advanced-summary{padding:14px}.advanced-summary strong{font-size:.94rem}.advanced-summary small{margin-left:16px}.advanced-content{padding:12px}}
+
+
+/* Ruta guiada de tres ámbitos SVE */
+.sve-learning{border:1px solid #cde7e5;border-top:5px solid #007b85;padding:24px;margin:25px 0;background:white}
+.learn-top h2{font:800 clamp(1.5rem,3vw,2.1rem)/1.18 Outfit,Arial,sans-serif;color:#00205b;margin:7px 0}
+.learn-top>p,.learn-body>p{color:#475569;line-height:1.65}
+.legal-distinction{background:#f0f8f8;border-left:4px solid #007b85;color:#27485b;padding:13px 16px;border-radius:8px;font-size:.9rem;line-height:1.55;margin:17px 0}
+.learn-area-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:20px 0}
+.learn-area{display:flex;flex-direction:column;gap:7px;text-align:left;border:2px solid #d8e8eb;border-radius:15px;padding:17px;background:#f8fafc;color:#00205b;cursor:pointer;min-height:139px;font-family:inherit}
+.learn-area:hover,.learn-area:focus-visible{border-color:#007b85;outline-offset:2px}
+.learn-area.chosen{background:#e9f7f5;border-color:#007b85;box-shadow:0 3px 13px #007b8518}
+.learn-area strong{font:750 .95rem/1.3 Outfit,Arial,sans-serif}.learn-area small{font-size:.75rem;color:#53687b;line-height:1.45}.learn-icon{font-size:1.6rem;color:#007b85}
+.learn-body h3{color:#00205b;font:750 1.15rem/1.3 Outfit,Arial,sans-serif;margin:22px 0 6px}.learn-body h4{color:#00205b;margin:18px 0 10px}
+.learn-route{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:17px 0}
+.learn-route>div{background:#f1f7f8;border-radius:10px;padding:12px;line-height:1.45;font-size:.81rem;color:#23465c;display:flex;flex-direction:column;gap:8px}
+.learn-route b{color:white;background:#007b85;border-radius:50%;width:28px;height:28px;display:grid;place-items:center}
+.learn-picker{padding:18px;background:#f8fafc;border-radius:14px;border:1px solid #dce8ed;display:grid;gap:10px;margin-top:15px}
+.learn-picker select{width:100%;padding:12px;border:1px solid #b5ced4;border-radius:9px;background:white;color:#00205b;font:inherit}
+.learn-dataset{margin-top:15px}.learn-dataset>p{line-height:1.6;color:#475569}
+.learn-rule{background:#fff6de;border:1px solid #f3d78c;padding:12px;border-radius:9px}
+.learn-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.learn-fields details{border:1px solid #d7e5e9;border-radius:9px;padding:9px 12px;background:white}
+.learn-fields summary{cursor:pointer;color:#00205b;font-weight:750;overflow-wrap:anywhere}
+.learn-fields p{font-size:.85rem;line-height:1.55;color:#455d69;margin:9px 0 4px}
+.learn-example{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.learn-example>div{display:grid;gap:5px;background:#f0f7f7;border-radius:8px;padding:10px;overflow-wrap:anywhere}
+.learn-example b{font-size:.73rem;color:#415a69}.learn-example span{color:#00205b;font-weight:750;font-size:.9rem}
+.learn-privacy{border-left:3px solid #e2a126;padding:9px 13px;background:#fffaf0;font-size:.84rem}
+.learn-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.learn-dataset-reminder{margin:14px 0;background:#edf8f7;border:1px solid #b9dcd9;padding:13px;border-radius:12px;color:#173e50;line-height:1.5}
+.learn-dataset-reminder button{margin-left:8px}
+@media(max-width:750px){.sve-learning{padding:15px}.learn-area-list{grid-template-columns:1fr}.learn-area{min-height:unset;padding:13px}.learn-route{grid-template-columns:1fr}.learn-route>div{flex-direction:row;align-items:center}.learn-route b{flex-shrink:0}.learn-fields,.learn-example{grid-template-columns:1fr}.learn-actions .btn{width:100%}}
