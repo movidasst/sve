@@ -297,3 +297,5 @@
 .learn-dataset-reminder{margin:14px 0;background:#edf8f7;border:1px solid #b9dcd9;padding:13px;border-radius:12px;color:#173e50;line-height:1.5}
 .learn-dataset-reminder button{margin-left:8px}
 @media(max-width:750px){.sve-learning{padding:15px}.learn-area-list{grid-template-columns:1fr}.learn-area{min-height:unset;padding:13px}.learn-route{grid-template-columns:1fr}.learn-route>div{flex-direction:row;align-items:center}.learn-route b{flex-shrink:0}.learn-fields,.learn-example{grid-template-columns:1fr}.learn-actions .btn{width:100%}}
+
+.learn-context{margin:12px 0;padding:15px;border-left:4px solid #007b85}.learn-data-helper>summary{cursor:pointer;color:#00205b;font-weight:800;padding:6px}.learn-data-helper>p{line-height:1.6;color:#475569}
