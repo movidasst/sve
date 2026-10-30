@@ -299,3 +299,20 @@
 @media(max-width:750px){.sve-learning{padding:15px}.learn-area-list{grid-template-columns:1fr}.learn-area{min-height:unset;padding:13px}.learn-route{grid-template-columns:1fr}.learn-route>div{flex-direction:row;align-items:center}.learn-route b{flex-shrink:0}.learn-fields,.learn-example{grid-template-columns:1fr}.learn-actions .btn{width:100%}}
 
 .learn-context{margin:12px 0;padding:15px;border-left:4px solid #007b85}.learn-data-helper>summary{cursor:pointer;color:#00205b;font-weight:800;padding:6px}.learn-data-helper>p{line-height:1.6;color:#475569}
+
+
+/* Asistente operativo SVE — lectura y preparación de informes */
+.sve-coach{border-left:4px solid #007b85;margin:16px 0 23px;padding:21px;background:#fff}
+.sve-coach-head h2{font:800 clamp(1.2rem,2.4vw,1.7rem)/1.3 Outfit,Arial,sans-serif;margin:6px 0;color:#00205b}
+.sve-coach-head p{color:#506474;line-height:1.6;margin:6px 0 15px}
+.sve-coach-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:14px 0}
+.sve-coach-stat{border:1px solid #d1e5e6;background:#f2f9f8;border-radius:11px;padding:13px;display:flex;flex-direction:column;gap:5px;color:#00205b}
+.sve-coach-stat b{font-size:.92rem}.sve-coach-stat strong{font-size:2rem;font-weight:800}.sve-coach-stat span,.sve-coach-stat small{color:#536878;font-size:.75rem;line-height:1.5}
+.sve-coach-next,.sve-coach-note{background:#fff5db;border-radius:9px;padding:12px 15px;color:#243f50;line-height:1.5}
+.sve-coach-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;margin:13px 0}
+.sve-coach-steps article{border:1px solid #d7e5e7;border-radius:10px;padding:11px;background:#f8fafc}
+.sve-coach-steps b{color:#007b85}.sve-coach-steps p{color:#475569;font-size:.84rem;line-height:1.5}
+.sve-coach ul{padding-left:23px;color:#475569;line-height:1.65}.sve-coach li{margin-bottom:7px}
+.sve-checklist{list-style:none;padding-left:0!important}.sve-checklist li{display:flex;gap:9px}.sve-checklist span{color:#b07800}
+@media(max-width:720px){.sve-coach{padding:14px}.sve-coach-grid{grid-template-columns:1fr}.sve-coach-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:450px){.sve-coach-steps{grid-template-columns:1fr}}
